@@ -61,10 +61,19 @@ type matrix<'T>(rowCnt : int, columnCnt : int, element : 'T [,]) =
         let array2d = Array2D.create rowCnt columnCnt zero
         matrix<'T>(rowCnt, columnCnt, array2d)
 
+    new (elem : 'T [] []) =
+        do if elem.Length <= 0 then failwith "Parameter for element is empty!"
+        do if elem.[0].Length <= 0 then failwith "Parameter for element has length zero row!"
+        let rowCnt = elem.Length
+        let columnCnt = elem.[0].Length
+        let array2d = Array2D.init rowCnt columnCnt (fun idx1 idx2 -> elem.[idx1].[idx2])
+        matrix<'T>(rowCnt, columnCnt, array2d)
+        
+
 
 module Matrix =
     let inline Multiply (matrix1 : 'T matrix) (matrix2 : 'T matrix) =
-        do if matrix1.columnCnt <> matrix2.rowCnt then failwith "Matrix sizes do not match."
+        do if matrix1.columnCnt <> matrix2.rowCnt then failwith "Matrix sizes does not match."
         let res = Array2D.create matrix1.rowCnt matrix2.columnCnt LanguagePrimitives.GenericZero
         for i=1 to matrix1.rowCnt do
             let row = matrix1.element.[i-1, *]
@@ -73,3 +82,10 @@ module Matrix =
                 let sum = (Array.map2 (fun elem1 elem2 -> elem1 * elem2) row column) |> Array.sum
                 res.[i-1, j-1] <- sum
         matrix<'T>(matrix1.rowCnt, matrix2.columnCnt, res)
+
+    let inline Add (matrix1 : 'T matrix) (matrix2 : 'T matrix) =
+        do if matrix1.rowCnt <> matrix2.rowCnt || matrix1.columnCnt <> matrix2.columnCnt then failwith "Matrix size does not match."
+        let rowCnt = matrix1.rowCnt
+        let columnCnt = matrix1.columnCnt
+        let resArray = Array2D.init rowCnt columnCnt (fun idx1 idx2 -> matrix1.element.[idx1, idx2] + matrix2.element.[idx1, idx2])
+        matrix<'T>(rowCnt, columnCnt, resArray)

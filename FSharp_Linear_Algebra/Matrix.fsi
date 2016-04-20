@@ -42,3 +42,9 @@ module Matrix =
         when 'T : (static member (*) : 'T * 'T -> 'T) and 
              'T : (static member (+) : 'T * 'T -> 'T) and 
              'T : (static member Zero : 'T)
+
+    /// <summary>Add two matrices.</summary>
+    /// <param name="matrix1">Matrix to be added. Left side.</param>
+    /// <param name="matrix2">Matrix to be added. Right side.</param>
+    val inline Add : matrix1 : 'T matrix -> matrix2 : 'T matrix -> 'T matrix
+        when 'T : (static member (+) : 'T * 'T -> 'T)
