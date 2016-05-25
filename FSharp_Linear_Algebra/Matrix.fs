@@ -89,3 +89,17 @@ module Matrix =
         let columnCnt = matrix1.columnCnt
         let resArray = Array2D.init rowCnt columnCnt (fun idx1 idx2 -> matrix1.element.[idx1, idx2] + matrix2.element.[idx1, idx2])
         matrix<'T>(rowCnt, columnCnt, resArray)
+
+    let inline Subtract (matrix1 : 'T matrix) (matrix2 : 'T matrix) =
+        do if matrix1.rowCnt <> matrix2.rowCnt || matrix1.columnCnt <> matrix2.columnCnt then failwith "Matrix size does not match."
+        let rowCnt = matrix1.rowCnt
+        let columnCnt = matrix1.columnCnt
+        let resArray = Array2D.init rowCnt columnCnt (fun idx1 idx2 -> matrix1.element.[idx1, idx2] - matrix2.element.[idx1, idx2])
+        matrix<'T>(rowCnt, columnCnt, resArray)
+
+    let Transpose (matrix1 : 'T matrix) =
+        let rowCnt = matrix1.columnCnt
+        let columnCnt = matrix1.rowCnt
+        let resArray = Array2D.init rowCnt columnCnt (fun idx1 idx2 -> matrix1.element.[idx2, idx1])
+        matrix<'T>(rowCnt, columnCnt, resArray)
+        

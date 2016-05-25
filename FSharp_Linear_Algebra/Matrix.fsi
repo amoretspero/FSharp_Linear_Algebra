@@ -32,12 +32,13 @@ type matrix<'T> =
     member Transpose : unit -> 'T matrix
 
 
-
+/// <summary>Module for operations on matrices.</summary>
 module Matrix =
 
     /// <summary>Multiplies matrix1 with matrix2 and returns its result.</summary>
     /// <param name="matrix1">Matrix to be multiplied. Left side.</param>
     /// <param name="matrix2">Matrix to be multiplied. Right side.</param>
+    /// <returns>Returns matrix multiplied. Size is (# of rows in matrix1) * (# of columns in matrix2)</returns>
     val inline Multiply : matrix1 : 'T matrix -> matrix2 : 'T matrix -> 'T matrix
         when 'T : (static member (*) : 'T * 'T -> 'T) and 
              'T : (static member (+) : 'T * 'T -> 'T) and 
@@ -46,5 +47,18 @@ module Matrix =
     /// <summary>Add two matrices.</summary>
     /// <param name="matrix1">Matrix to be added. Left side.</param>
     /// <param name="matrix2">Matrix to be added. Right side.</param>
+    /// <returns>Returns the addition result of two matrices.</returns>
     val inline Add : matrix1 : 'T matrix -> matrix2 : 'T matrix -> 'T matrix
         when 'T : (static member (+) : 'T * 'T -> 'T)
+
+    /// <summary>Subtract one matrix from another.</summary>
+    /// <param name="matrix1">Matrix to be subtracted from. Left side.</param>
+    /// <param name="matrix2">Matrix to subtract. Right side. </param>
+    /// <returns>Returns the subtraction result of two matrices.</returns>
+    val inline Subtract : matrix1 : 'T matrix -> matrix2 : 'T matrix -> 'T matrix
+        when 'T : (static member (-) : 'T * 'T -> 'T)
+
+    /// <summary>Transpose given matrix.</summary>
+    /// <param name="matrix1">Matrix to be transposed.</param>
+    /// <returns>Returns the transposed matrix.</returns>
+    val Transpose : matrix1 : 'T matrix -> 'T matrix
