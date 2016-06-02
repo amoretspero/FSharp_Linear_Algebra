@@ -33,19 +33,13 @@ type matrix<'T>(rowCnt : int, columnCnt : int, element : 'T [,]) =
 
     // Instance methods ---------------------------------------------
 
-    member mat.printMatrix() =
-        if _rowCnt >= 10 || _columnCnt >= 10 then
-            printf "Matrix is too large to print. Size : %d * %d\n" _rowCnt _columnCnt
-        else
-            for i=1 to _rowCnt do
-                for j=1 to _columnCnt do
-                    printf "%A\t" _element.[i-1, j-1]
-                printf "\n"
-    
-    member mat.Transpose() =
-        let columns = [| for i in 1 .. mat.columnCnt -> mat.element.[*, i-1] |]
-        matrix<'T>(mat.columnCnt, mat.rowCnt, (Array2D.init mat.columnCnt mat.rowCnt (fun idx1 idx2 -> columns.[idx1].[idx2])))
-
+    member mat.Format() =
+            let sb = System.Text.StringBuilder()
+            for i = 1 to _rowCnt do
+                for j = 1 to _columnCnt do
+                    sb.AppendFormat("{0}\t", _element.[i - 1, j - 1]) |> ignore
+                sb.AppendLine() |> ignore
+            sb.ToString()
 
     // Static properties --------------------------------------------
 
@@ -66,7 +60,7 @@ type matrix<'T>(rowCnt : int, columnCnt : int, element : 'T [,]) =
         do if elem.[0].Length <= 0 then failwith "Parameter for element has length zero row!"
         let rowCnt = elem.Length
         let columnCnt = elem.[0].Length
-        let array2d = Array2D.init rowCnt columnCnt (fun idx1 idx2 -> elem.[idx1].[idx2])
+        let array2d = elem |> array2D
         matrix<'T>(rowCnt, columnCnt, array2d)
         
 

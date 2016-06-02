@@ -25,11 +25,9 @@ type matrix<'T> =
     /// <summary>Gets elements of matrix.</summary>
     member element : 'T [, ]
 
-    /// <summary>Prints out the matrix.</summary>
-    member printMatrix : unit -> unit
+    /// <summary>Format the matrix.</summary>
+    member Format : unit -> string
 
-    /// <summary>Transpose given matrix.</summary>
-    member Transpose : unit -> 'T matrix
 
 
 /// <summary>Module for operations on matrices.</summary>

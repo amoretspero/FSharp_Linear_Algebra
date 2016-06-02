@@ -8,27 +8,35 @@ open FSharp_Linear_Algebra
 
 let testMatrix = matrix<int>(3, 7, (Array2D.init 3 7 (fun idx1 idx2 -> idx1 * idx2 - 1)))
 let zeroMatrix = matrix(7, 7, 0)
-printf "Size of matrix is : %d * %d\n" testMatrix.rowCnt testMatrix.columnCnt
-printf "First element is : %A\n\n" testMatrix.element.[0, 0]
-printf "The whole matrix is : \n"
-testMatrix.printMatrix()
-printf "Transposed one is : \n"
-testMatrix.Transpose().printMatrix()
+
+printfn "Size of matrix is : %d * %d" testMatrix.rowCnt testMatrix.columnCnt
+printfn "First element is : %A\n" testMatrix.element.[0, 0]
+testMatrix.Format()
+|> printf "The whole matrix is :\n%s" 
+
 
 let mat1 = matrix<float>(3, 4, (Array2D.init 3 4 (fun idx1 idx2 -> (float)idx1 * (float)idx2 + 7.0)))
-printf "mat1 is : \n"
-mat1.printMatrix()
+mat1.Format()
+|> printfn "mat1 is :\n%s"
+
 let mat2 = matrix<float>(4, 3, (Array2D.init 4 3 (fun idx1 idx2 -> (float)idx1 * (float)idx2 + 2.3)))
-printf "mat2 is : \n"
-mat2.printMatrix()
-printf "mat1 multiplied by mat2 is : \n"
-(Matrix.Multiply mat1 mat2).printMatrix()
+mat2.Format()
+|> printfn "mat2 is :\n%s"
+
+(Matrix.Multiply mat1 mat2).Format()
+|> printfn "mat1 multiplied by mat2 is :\n%s"
+
 let mat3 = matrix<float>([| [| 1.334; 8.461; 9.361; 2.904; 5.837 |]; [| 0.948; 8.847; 6.372; 4.981; 7.829 |]; [| 1.938; 3.284; 8.944; 5.748; 2.987 |] |])
 let mat4 = matrix<float>([| [| 5.984; 3.847; 2.938 |]; [| 3.948; 2.912; 3.333 |]; [| 5.938; 3.928; 4.081 |]; [| 4.928; 1.932; 2.241 |]; [| 9.846; 3.523; 6.324 |] |])
-printfn "mat3 is : "
-mat3.printMatrix()
-printfn "mat4 is : "
-mat4.printMatrix()
-printfn "mat3 multiplied by mat4 is : "
-(Matrix.Multiply mat3 mat4).printMatrix()
-Matrix.Transpose(mat3)
+
+mat3.Format()
+|> printfn "mat3 is :\n%s"
+
+mat4.Format()
+|> printfn "mat4 is :\n%s"
+
+(Matrix.Multiply mat3 mat4).Format()
+|> printfn "mat3 multiplied by mat4 is :\n%s"
+
+Matrix.Transpose(mat3).Format()
+|> printfn "Transposed mat3 is :\n%s"
