@@ -49,7 +49,7 @@ module Matrix =
     val inline Add : matrix1 : 'T matrix -> matrix2 : 'T matrix -> 'T matrix
         when 'T : (static member (+) : 'T * 'T -> 'T)
 
-    /// <summary>Subtract one matrix from another.</summary>
+    /// <summary>Subtract one matrix from another.</summary>B
     /// <param name="matrix1">Matrix to be subtracted from. Left side.</param>
     /// <param name="matrix2">Matrix to subtract. Right side. </param>
     /// <returns>Returns the subtraction result of two matrices.</returns>
@@ -60,3 +60,19 @@ module Matrix =
     /// <param name="matrix1">Matrix to be transposed.</param>
     /// <returns>Returns the transposed matrix.</returns>
     val Transpose : matrix1 : 'T matrix -> 'T matrix
+    
+    /// <summary>Multiply by constant.</summary>
+    /// <param name="c">Constant factor to be multiplied to given matrix.</param>
+    /// <param name="matrix1">Matrix to be multiplied by "c".</param>
+    /// <returns>Returns the matrix multiplied by constant.</returns>
+    val inline ScalarMultiply : c : 'T -> matrix1 : 'T matrix -> 'T matrix
+        when 'T : (static member (*) : 'T * 'T -> 'T)
+
+    /// <summary>Creates identity matrix with given size.</summary>
+    /// <param name="size">Size for row and column.</param>
+    /// <param name="one">One of type 'T.</param>
+    /// <returns>Returns identity matrix whose size of "size" * "size".</returns>
+    val inline Identity : size : int -> one : 'T -> 'T matrix
+        when 'T : (static member Zero : 'T) and
+             'T : (static member One : 'T) and
+             'T : comparison

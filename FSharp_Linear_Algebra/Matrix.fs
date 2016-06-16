@@ -97,3 +97,12 @@ module Matrix =
         let resArray = Array2D.init rowCnt columnCnt (fun idx1 idx2 -> matrix1.element.[idx2, idx1])
         matrix<'T>(rowCnt, columnCnt, resArray)
         
+    let inline ScalarMultiply (c : 'T) (matrix1 : 'T matrix) =
+        matrix<'T>(matrix1.rowCnt, matrix1.columnCnt, (Array2D.init matrix1.rowCnt matrix1.columnCnt (fun idx1 idx2 -> matrix1.element.[idx1, idx2] * c)))
+
+    let inline Identity (size : int) (one : 'T) =
+        do if LanguagePrimitives.GenericComparison one LanguagePrimitives.GenericOne <> 0 then failwith "one is not one!"
+        let res = Array2D.create size size LanguagePrimitives.GenericZero
+        for i=1 to size do
+            res.[i-1, i-1] <- one
+        matrix<'T>(size, size, res)
