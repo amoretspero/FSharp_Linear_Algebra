@@ -40,3 +40,9 @@ mat4.Format()
 
 Matrix.Transpose(mat3).Format()
 |> printfn "Transposed mat3 is :\n%s"
+
+let mat5 = matrix<decimal>([| [| 2M; 1M; 1M; |]; [| 4M; -6M; 0M; |]; [| -2M; 7M; 2M; |] |])
+Matrix.GaussEliminate(mat5).Format() |> printfn "mat5 eliminated is: \n%s"
+
+let mat6 = matrix<decimal>([| [| 1M; 1M; 1M; |]; [| 2M; 2M; 5M; |]; [| 4M; 6M; 8M; |] |])
+Matrix.GaussEliminate(mat6).Format() |> printfn "mat6 eliminated is: \n%s"

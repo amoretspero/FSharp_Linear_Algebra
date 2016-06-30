@@ -106,3 +106,32 @@ module Matrix =
         for i=1 to size do
             res.[i-1, i-1] <- one
         matrix<'T>(size, size, res)
+
+    let GaussEliminate (mat : decimal matrix) =
+        do if mat.columnCnt <> mat.rowCnt then failwith "Matrix should be square."
+        let mutable cnt = 0
+        while (cnt < mat.rowCnt) do
+            let checkPivot = mat.element.[cnt, cnt] <> 0M
+            if checkPivot then
+                for idx1 = cnt+1 to mat.rowCnt-1 do
+                    let ratio = mat.element.[idx1, cnt] / mat.element.[cnt, cnt]
+                    for idx2 = cnt to mat.rowCnt-1 do
+                        mat.element.[idx1, idx2] <- mat.element.[idx1, idx2] - mat.element.[cnt, idx2] * ratio
+                cnt <- cnt + 1
+            else
+                let mutable findPivot = cnt + 1
+                let mutable findBreak = false
+                while (findPivot < mat.rowCnt && not findBreak) do
+                    if mat.element.[findPivot, cnt] <> 0M then findBreak <- true
+                    findPivot <- findPivot + 1
+                if not findBreak then
+                    failwith "Gauss elimination not possible. No pivot."
+                else
+                    let mutable changeRowCnt = 0
+                    while (changeRowCnt < mat.rowCnt) do
+                        let changeRowTemp = mat.element.[cnt, changeRowCnt]
+                        mat.element.[cnt, changeRowCnt] <- mat.element.[findPivot, changeRowCnt]
+                        changeRowCnt <- changeRowCnt + 1
+        mat
+
+                    

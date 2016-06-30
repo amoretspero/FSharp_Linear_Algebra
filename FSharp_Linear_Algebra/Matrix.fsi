@@ -76,3 +76,5 @@ module Matrix =
         when 'T : (static member Zero : 'T) and
              'T : (static member One : 'T) and
              'T : comparison
+
+    val GaussEliminate : mat : decimal matrix -> decimal matrix
