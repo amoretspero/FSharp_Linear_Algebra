@@ -52,3 +52,8 @@ try
     Matrix.GaussEliminate(mat7).Format() |> printfn "mat7 eliminated is: \n%s"
 with
     | :? System.Exception as e -> printfn "mat7 cannot be eliminated."
+
+try
+    Matrix.Add mat3 mat4 |> ignore
+with
+    | :? FSharp_Linear_Algebra.SizeUnmatch as e -> printfn "Size unmatched. Matrix of %d by %d with matrix of %d by %d." e.Data0 e.Data1 e.Data2 e.Data3
