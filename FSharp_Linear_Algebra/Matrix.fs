@@ -5,7 +5,8 @@ open System.Collections
 open System.Collections.Generic
 open System.Numerics
 
-exception NoGaussEliminationPossible 
+/// <summary>Exception that indicates gauss elimination of given matrix is not possible.</summary>
+exception NoGaussEliminationPossible
 exception SizeUnmatch of int * int * int * int
 exception NotSquare of int * int
 
@@ -37,12 +38,12 @@ type matrix<'T>(rowCnt : int, columnCnt : int, element : 'T [,]) =
     // Instance methods ---------------------------------------------
 
     member mat.Format() =
-            let sb = System.Text.StringBuilder()
-            for i = 1 to _rowCnt do
-                for j = 1 to _columnCnt do
-                    sb.AppendFormat("{0}\t", _element.[i - 1, j - 1]) |> ignore
-                sb.AppendLine() |> ignore
-            sb.ToString()
+        let sb = System.Text.StringBuilder()
+        for i = 1 to _rowCnt do
+            for j = 1 to _columnCnt do
+                sb.AppendFormat("{0}\t", _element.[i - 1, j - 1]) |> ignore
+            sb.AppendLine() |> ignore
+        sb.ToString()
 
     // Static properties --------------------------------------------
 

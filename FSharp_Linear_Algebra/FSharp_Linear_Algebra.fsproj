@@ -46,6 +46,8 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Matrix.fsi" />
     <Compile Include="Matrix.fs" />
+    <Compile Include="Vector.fsi" />
+    <Compile Include="Vector.fs" />
     <None Include="Script.fsx" />
   </ItemGroup>
   <PropertyGroup>
