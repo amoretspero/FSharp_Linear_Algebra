@@ -46,3 +46,9 @@ Matrix.GaussEliminate(mat5).Format() |> printfn "mat5 eliminated is: \n%s"
 
 let mat6 = matrix<decimal>([| [| 1M; 1M; 1M; |]; [| 2M; 2M; 5M; |]; [| 4M; 6M; 8M; |] |])
 Matrix.GaussEliminate(mat6).Format() |> printfn "mat6 eliminated is: \n%s"
+
+let mat7 = matrix<decimal>([| [| 1M; 1M; 1M; |]; [| 2M; 2M; 5M; |]; [| 4M; 4M; 8M; |] |])
+try
+    Matrix.GaussEliminate(mat7).Format() |> printfn "mat7 eliminated is: \n%s"
+with
+    | :? System.Exception as e -> printfn "mat7 cannot be eliminated."

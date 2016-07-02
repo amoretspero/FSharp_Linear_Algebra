@@ -5,6 +5,7 @@ open System.Collections
 open System.Collections.Generic
 open System.Numerics
 
+exception NoGaussEliminationPossible
 
 /// <summary>Class for generic matrix and its basic operations.</summary>
 type matrix<'T>(rowCnt : int, columnCnt : int, element : 'T [,]) =
@@ -125,12 +126,14 @@ module Matrix =
                     if mat.element.[findPivot, cnt] <> 0M then findBreak <- true
                     findPivot <- findPivot + 1
                 if not findBreak then
-                    failwith "Gauss elimination not possible. No pivot."
+                    raise NoGaussEliminationPossible
                 else
+                    findPivot <- findPivot - 1
                     let mutable changeRowCnt = 0
                     while (changeRowCnt < mat.rowCnt) do
                         let changeRowTemp = mat.element.[cnt, changeRowCnt]
                         mat.element.[cnt, changeRowCnt] <- mat.element.[findPivot, changeRowCnt]
+                        mat.element.[findPivot, changeRowCnt] <- changeRowTemp
                         changeRowCnt <- changeRowCnt + 1
         mat
 
