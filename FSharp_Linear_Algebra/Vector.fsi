@@ -7,6 +7,8 @@ open System.Numerics
 
 [<Class>]
 type vector<'T> =
+
+    new : 'T [] -> 'T vector
     
     member size : int
 
@@ -23,7 +25,5 @@ module Vector =
     val inline Sub : vec1 : 'T vector -> vec2 : 'T vector -> 'T vector
         when 'T : (static member(-) : 'T * 'T -> 'T)
 
-    val inline InnerProduct : vec1 : 'T vector -> vec2 : 'T vector -> 'T
-        when 'T : (static member (+) : 'T * 'T -> 'T) and
-             'T : (static member (*) : 'T * 'T -> 'T) and
-             'T : (static member Zero : 'T)
+    val inline InnerProduct : vec1 : 'T vector -> vec2 : 'T vector -> 'T vector
+        when 'T : (static member (*) : 'T * 'T -> 'T)

@@ -42,12 +42,11 @@ type vector<'T>(element : 'T []) =
     
 
 module Vector =
-
     let inline Add (vec1 : 'T vector) (vec2 : 'T vector) : 'T vector =
         vector(Array.map2 (fun x y -> x + y) vec1.element vec2.element)
 
     let inline Sub (vec1 : 'T vector) (vec2 : 'T vector) : 'T vector =
         vector(Array.map2 (fun x y -> x - y) vec1.element vec2.element)
 
-    let inline InnerProduct (vec1 : 'T vector) (vec2 : 'T vector) : 'T =
-        Array.sum(Array.map2 (fun x y -> x * y) vec1.element vec2.element)
+    let inline InnerProduct (vec1 : 'T vector) (vec2 : 'T vector) : 'T vector =
+        vector(Array.map2 (fun x y -> x * y) vec1.element vec2.element)
