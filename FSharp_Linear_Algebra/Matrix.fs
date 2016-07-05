@@ -111,13 +111,15 @@ module Matrix =
             res.[i-1, i-1] <- one // Only diagonal elements should be one.
         matrix<'T>(size, size, res)
 
-    let GaussEliminate (mat : decimal matrix) =
+    let inline GaussEliminate (mat : 'T matrix) : 'T matrix =
         do if mat.columnCnt <> mat.rowCnt then raise (NotSquare(mat.columnCnt, mat.rowCnt)) // Check if matrix is square.
         let mutable cnt = 0
         while (cnt < mat.rowCnt) do
-            let checkPivot = mat.element.[cnt, cnt] <> 0M // Check the pivot of row.
+            let checkPivot = mat.element.[cnt, cnt] <> LanguagePrimitives.GenericZero // Check the pivot of row.
             if checkPivot then // If pivot exists, i.e., not zero, eliminate one step.
                 for idx1 = cnt+1 to mat.rowCnt-1 do
+                    let tmp1 = mat.element.[idx1, cnt]
+                    let tmp2 = mat.element.[cnt, cnt]
                     let ratio = mat.element.[idx1, cnt] / mat.element.[cnt, cnt] // Ratio of pivot and below-pivot element of row that is to be modified.
                     for idx2 = cnt to mat.rowCnt-1 do
                         mat.element.[idx1, idx2] <- mat.element.[idx1, idx2] - mat.element.[cnt, idx2] * ratio
@@ -126,7 +128,7 @@ module Matrix =
                 let mutable findPivot = cnt + 1
                 let mutable findBreak = false
                 while (findPivot < mat.rowCnt && not findBreak) do // With below-pivot rows, find row that has appropriate pivot.
-                    if mat.element.[findPivot, cnt] <> 0M then findBreak <- true
+                    if mat.element.[findPivot, cnt] <> LanguagePrimitives.GenericZero then findBreak <- true
                     findPivot <- findPivot + 1
                 if not findBreak then // When no row is available for cure, raise exception.
                     raise NoGaussEliminationPossible
@@ -139,5 +141,3 @@ module Matrix =
                         mat.element.[findPivot, changeRowCnt] <- changeRowTemp
                         changeRowCnt <- changeRowCnt + 1
         mat
-
-                    

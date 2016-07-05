@@ -53,6 +53,12 @@ try
 with
     | :? System.Exception as e -> printfn "mat7 cannot be eliminated."
 
+let mat8 = matrix<float>([| [| 1.0; 1.0; 1.0; |]; [| 2.0; 2.0; 5.0; |]; [| 4.0; 6.0; 8.0; |] |])
+try
+    Matrix.GaussEliminate(mat8).Format() |> printfn "mat8 eliminated is: \n%s"
+with
+    | :? System.Exception as e -> printfn "mat8 cannot be eliminated."
+
 try
     Matrix.Add mat3 mat4 |> ignore
 with

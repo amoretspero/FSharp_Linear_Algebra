@@ -22,7 +22,7 @@ module Vector =
     val inline Add : vec1 : 'T vector -> vec2 : 'T vector -> 'T vector
         when 'T : (static member (+) : 'T * 'T -> 'T)
 
-    val inline Sub : vec1 : 'T vector -> vec2 : 'T vector -> 'T vector
+    val inline Subtract : vec1 : 'T vector -> vec2 : 'T vector -> 'T vector
         when 'T : (static member(-) : 'T * 'T -> 'T)
 
     val inline InnerProduct : vec1 : 'T vector -> vec2 : 'T vector -> 'T vector

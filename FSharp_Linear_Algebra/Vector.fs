@@ -25,7 +25,7 @@ type vector<'T>(element : 'T []) =
         let sb = System.Text.StringBuilder()
         sb.Append("[") |> ignore
         for i=0 to _size - 1 do
-            sb.AppendFormat("%s", [| _elem.[i] |]) |> ignore
+            sb.AppendFormat("{0} ", _elem.[i]) |> ignore
             if (i < _size - 1) then sb.Append(", ") |> ignore
         sb.Append("]") |> ignore
         sb.ToString()
@@ -45,7 +45,7 @@ module Vector =
     let inline Add (vec1 : 'T vector) (vec2 : 'T vector) : 'T vector =
         vector(Array.map2 (fun x y -> x + y) vec1.element vec2.element)
 
-    let inline Sub (vec1 : 'T vector) (vec2 : 'T vector) : 'T vector =
+    let inline Subtract (vec1 : 'T vector) (vec2 : 'T vector) : 'T vector =
         vector(Array.map2 (fun x y -> x - y) vec1.element vec2.element)
 
     let inline InnerProduct (vec1 : 'T vector) (vec2 : 'T vector) : 'T vector =
