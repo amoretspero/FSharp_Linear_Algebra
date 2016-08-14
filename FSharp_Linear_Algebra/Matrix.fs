@@ -10,7 +10,7 @@ exception NoGaussEliminationPossible
 exception SizeUnmatch of int * int * int * int
 exception NotSquare of int * int
 
-/// <summary>Class for generic matrix and its basic operations.</summary>
+/// <summary>Class for generic matrices.</summary>
 type matrix<'T>(rowCnt : int, columnCnt : int, element : 'T [,]) =
 
     // Private data -------------------------------------------------
@@ -54,11 +54,17 @@ type matrix<'T>(rowCnt : int, columnCnt : int, element : 'T [,]) =
 
     // Explicit Constructors ----------------------------------------
 
+    /// <summary>Generates matrix with given row count and column count. All elements will be filled with given zero value.</summary>
+    /// <param name="rowCnt">Number of rows</param>
+    /// <param name="columnCnt">Number of columns</param>
+    /// <param name="zero">Represents zero for type to use.</param>
     new (rowCnt : int, columnCnt : int, zero : 'T) = 
         let rnd = System.Random()
         let array2d = Array2D.create rowCnt columnCnt zero
         matrix<'T>(rowCnt, columnCnt, array2d)
 
+    /// <summary>Generates matrix with given array of array of elements.</summary>
+    /// <param name="elem">Array of array of 'T elements.</param>
     new (elem : 'T [] []) =
         do if elem.Length <= 0 then failwith "Parameter for element is empty!"
         do if elem.[0].Length <= 0 then failwith "Parameter for element has length zero row!"
@@ -68,8 +74,13 @@ type matrix<'T>(rowCnt : int, columnCnt : int, element : 'T [,]) =
         matrix<'T>(rowCnt, columnCnt, array2d)
         
 
-
+/// <summary>Module for operations on matrices.</summary>
 module Matrix =
+
+    /// <summary>Multiplies matrix1 with matrix2 and returns its result.</summary>
+    /// <param name="matrix1">Matrix to be multiplied. Left side.</param>
+    /// <param name="matrix2">Matrix to be multiplied. Right side.</param>
+    /// <returns>Returns matrix multiplied. Size is (# of rows in matrix1) * (# of columns in matrix2)</returns>
     let inline Multiply (matrix1 : 'T matrix) (matrix2 : 'T matrix) =
         do if matrix1.columnCnt <> matrix2.rowCnt then failwith "Matrix sizes does not match." // Check if matrix size matches. 
         let res = Array2D.create matrix1.rowCnt matrix2.columnCnt LanguagePrimitives.GenericZero // Create 2d-array for matrix element with generic zero.
@@ -81,6 +92,10 @@ module Matrix =
                 res.[i-1, j-1] <- sum 
         matrix<'T>(matrix1.rowCnt, matrix2.columnCnt, res)
 
+    /// <summary>Add two matrices.</summary>
+    /// <param name="matrix1">Matrix to be added. Left side.</param>
+    /// <param name="matrix2">Matrix to be added. Right side.</param>
+    /// <returns>Returns the addition result of two matrices.</returns>
     let inline Add (matrix1 : 'T matrix) (matrix2 : 'T matrix) =
         do if matrix1.rowCnt <> matrix2.rowCnt || matrix1.columnCnt <> matrix2.columnCnt then raise (SizeUnmatch(matrix1.rowCnt, matrix1.columnCnt, matrix2.rowCnt, matrix2.columnCnt)) // Check if matrix size matches.
         let rowCnt = matrix1.rowCnt
@@ -88,6 +103,10 @@ module Matrix =
         let resArray = Array2D.init rowCnt columnCnt (fun idx1 idx2 -> matrix1.element.[idx1, idx2] + matrix2.element.[idx1, idx2]) // Generate result.
         matrix<'T>(rowCnt, columnCnt, resArray)
 
+    /// <summary>Subtract one matrix from another.</summary>B
+    /// <param name="matrix1">Matrix to be subtracted from. Left side.</param>
+    /// <param name="matrix2">Matrix to subtract. Right side. </param>
+    /// <returns>Returns the subtraction result of two matrices.</returns>
     let inline Subtract (matrix1 : 'T matrix) (matrix2 : 'T matrix) =
         do if matrix1.rowCnt <> matrix2.rowCnt || matrix1.columnCnt <> matrix2.columnCnt then raise (SizeUnmatch(matrix1.rowCnt, matrix1.columnCnt, matrix2.rowCnt, matrix2.columnCnt)) // Check if matrix size matches.
         let rowCnt = matrix1.rowCnt
@@ -95,15 +114,26 @@ module Matrix =
         let resArray = Array2D.init rowCnt columnCnt (fun idx1 idx2 -> matrix1.element.[idx1, idx2] - matrix2.element.[idx1, idx2]) // Generate result.
         matrix<'T>(rowCnt, columnCnt, resArray)
 
+    /// <summary>Transpose given matrix.</summary>
+    /// <param name="matrix1">Matrix to be transposed.</param>
+    /// <returns>Returns the transposed matrix.</returns>
     let Transpose (matrix1 : 'T matrix) =
         let rowCnt = matrix1.columnCnt
         let columnCnt = matrix1.rowCnt
         let resArray = Array2D.init rowCnt columnCnt (fun idx1 idx2 -> matrix1.element.[idx2, idx1]) // Generate result, transposed.
         matrix<'T>(rowCnt, columnCnt, resArray)
         
+    /// <summary>Multiply by constant.</summary>
+    /// <param name="c">Constant factor to be multiplied to given matrix.</param>
+    /// <param name="matrix1">Matrix to be multiplied by "c".</param>
+    /// <returns>Returns the matrix multiplied by constant.</returns>
     let inline ScalarMultiply (c : 'T) (matrix1 : 'T matrix) =
         matrix<'T>(matrix1.rowCnt, matrix1.columnCnt, (Array2D.init matrix1.rowCnt matrix1.columnCnt (fun idx1 idx2 -> matrix1.element.[idx1, idx2] * c))) // Generate result, multiplied by scalar value.
 
+    /// <summary>Creates identity matrix with given size.</summary>
+    /// <param name="size">Size for row and column.</param>
+    /// <param name="one">One of type 'T.</param>
+    /// <returns>Returns identity matrix whose size of "size" * "size".</returns>
     let inline Identity (size : int) (one : 'T) =
         do if LanguagePrimitives.GenericComparison one LanguagePrimitives.GenericOne <> 0 then failwith "one is not one!" // Check if provided one is really one.
         let res = Array2D.create size size LanguagePrimitives.GenericZero // Initialize result matrix with generic zero.
@@ -111,6 +141,10 @@ module Matrix =
             res.[i-1, i-1] <- one // Only diagonal elements should be one.
         matrix<'T>(size, size, res)
 
+    /// <summary>Gauss eliminates given decimal matrix.</summary>
+    /// <param name="mat">Matrix to be eliminated.</param>
+    /// <returns>Returns eliminated result.</returns>
+    /// <exception cref="FSharp_Linear_Algebra.NoGaussEliminationPossible">Thrown when gauss elimination cannot be performed.</exception>
     let inline GaussEliminate (mat : 'T matrix) : 'T matrix =
         do if mat.columnCnt <> mat.rowCnt then raise (NotSquare(mat.columnCnt, mat.rowCnt)) // Check if matrix is square.
         let mutable cnt = 0

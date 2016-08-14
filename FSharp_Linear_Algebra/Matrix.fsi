@@ -4,6 +4,7 @@
 exception NoGaussEliminationPossible
 
 [<Class>]
+/// <summary>Class for generic matrices.</summary>
 type matrix<'T> = 
     
     /// <summary>Generates matrix with given row count, column count and element.
