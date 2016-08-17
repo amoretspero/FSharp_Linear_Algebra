@@ -2,10 +2,16 @@
 Library for linear algebra made with F#.  
   
 ##Version  
-Current : **0.2.1.1**  
+Current : **0.3.0.0**  
 Status : **Stable**  
   
 ##Update History  
+  
+### 0.2.1.1 -> 0.3.0.0  
+  
+- For <code>int32</code>, <code>int64</code>, <code>float32</code>, <code>double</code> typed vectors, size can be calculated.  
+- Added zero vector, unit vector creator.  
+- Added method to check if given vector is unit vector.  
   
 ##Description  
 This project is to provide F#-made linear algebra library.  
@@ -130,7 +136,7 @@ matrixGaussEliminate:
   
 ###Vector  
 **Construction** : You can create vector with one option.  
-1) Basic constructor - <code>(element : 'T [])</code>
+1) Basic constructor - <code>(element : 'T [])</code>  
 ```
 // Basic constructor. Should provide type.
 let vector1 = vector<int>([| 1; 2; 3; 4; 5 |])
@@ -153,6 +159,13 @@ Output:
 1) Addition - <code>Vector.Add()</code>  
 2) Subtracion - <code>Vector.Subtract()</code>  
 3) Inner Production - <code>Vector.InnerProduct</code>  
+4) Size (int32) - <code>Vector.SizeInt32</code>  
+5) Size (int64) - <code>Vector.SizeInt64</code>  
+6) Size (float32) - <code>Vector.SizeFloat32</code>  
+7) Size (double) - <code>Vector.SizeDouble</code>  
+8) Unit vector check - <code>Vector.IsUnitVector()</code>  
+9) Zero vector constructor - <code>Vector.ZeroVector()</code>  
+10) Unit vector constructor - <code>Vector.UnitVector()</code>  
 ```
 // Vector initialization
 let vec1 = vector<decimal>([| 1.0M; 2.0M; 3.0M; |])
@@ -170,6 +183,42 @@ vectorSubtract.Format() |> printfn "vectorSub: \n%s"
 let vectorInnerProduct = Vector.InnerProduct vec1 vec2
 vectorInnerProduct.Format() |> printfn "vectorInnerProduct: \n%s"
 
+// Size - int32
+let sizeInt32Vector = vector<int32>([| 3; 4 |])
+Vector.SizeInt32 sizeInt32Vector |> printfn "Size of %s is: \n%d" (sizeInt32Vector.Format())
+
+// Size - int64
+let sizeInt64Vector = vector<int64>([| 3L; 4L |])
+Vector.SizeInt64 sizeInt64Vector |> printfn "Size of %s is: \n%d" (sizeInt32Vector.Format())
+
+// Size - float32
+let sizeFloat32Vector = vector<float32>([| 3.2f; 4.1f |])
+Vector.SizeFloat32 sizeFloat32Vector |> printfn "Size of %s is: \n%A" (sizeFloat32Vector.Format())
+
+// Size - int32
+let sizeDoubleVector = vector<double>([| 2.5; 4.7; 5.6 |])
+Vector.SizeDouble sizeDoubleVector |> printfn "Size of %s is: \n%A" (sizeDoubleVector.Format())
+
+// Zero vector creation
+let zeroVector = Vector.ZeroVector<decimal> 3
+zeroVector.Format() |> printfn "zeroVector: \n%s"
+
+// Unit vector creation
+let unitVector = Vector.UnitVector 5 3 1.0
+unitVector.Format() |> printfn "unitVector: \n%s"
+
+// Check unit vector
+let nonUnitVector = vector<float>([| 1.2; 2.1; 0.0 |])
+let unitVector2 = vector<float>([| 0.5; -0.5; 0.5; -0.5 |])
+if Vector.IsUnitVector nonUnitVector then 
+    printfn "ERROR! This is not unit vector: \n%s" (nonUnitVector.Format()) 
+else 
+    printfn "CORRECT! This is not unit vector: \n%s" (nonUnitVector.Format())
+if Vector.IsUnitVector unitVector then
+    printfn "CORRECT! This is unit vector: \n%s" (unitVector2.Format())
+else
+    printfn "ERROR! This is unit vector: \n%s" (unitVector2.Format())
+
 (*
 Output: 
 
@@ -179,6 +228,22 @@ vectorSub:
 [-1.0 , 3.5 , 5.0 ]
 vectorInnerProduct: 
 [2.00 , -3.00 , -6.00 ]
+Size of [3 , 4 ] is: 
+5
+Size of [3 , 4 ] is: 
+5
+Size of [3.2 , 4.1 ] is: 
+5.20096159f
+Size of [2.5 , 4.7 , 5.6 ] is: 
+7.726577509
+zeroVector: 
+[0 , 0 , 0 ]
+unitVector: 
+[0 , 0 , 1 , 0 , 0 ]
+CORRECT! This is not unit vector: 
+[1.2 , 2.1 , 0 ]
+CORRECT! This is unit vector: 
+[0.5 , -0.5 , 0.5 , -0.5 ]
 
 *)
 ```  

@@ -50,6 +50,10 @@ module Vector =
     /// <summary>Gets size of int32 vector as int32.</summary>
     /// <param name="vec1">Vector to get the size of.</param>
     val inline SizeInt32 : vec1 : int32 vector -> int32
+
+    /// <summary>Gets size of int64 vector as int64.</summary>
+    /// <param name="vec1">Vector to get the size of.</param>
+    val inline SizeInt64 : vec1 : int64 vector -> int64
    
     /// <summary>Gets size of float32 vector as float32.</summary>
     /// <param name="vec1">Vector to get the size of.</param>
@@ -58,3 +62,23 @@ module Vector =
     /// <summary>Gets size of double vector as double.</summary>
     /// <param name="vec1">Vector to get the size of.</param>
     val inline SizeDouble : vec1 : double vector -> double
+
+    /// <summary>Creates and returns zero vector of given size.</summary>
+    /// <param name="size">Size of zero vector to create.</param>
+    val ZeroVector : dim : int -> 'T vector
+
+    /// <summary>Creates and returns unit vector of given dimension, having one of type 'T at location.
+    /// <param name="dim">Dimension of unit vector.</param>
+    /// <param name="location">Index of one, starting from 1.</param>
+    /// <param name="one">One of type 'T.</param>
+    val inline UnitVector : dim : int -> location : int -> one : 'T -> 'T vector
+        when 'T : (static member One : 'T) and
+             'T : comparison
+
+    /// <summary>Check if given vector is unit vector or not.</summary>
+    /// <param name="vec">Vector to check if unit vector or not.</param>
+    val inline IsUnitVector : vec : vector<'T> -> bool
+        when 'T : (static member ( * ) : 'T * 'T -> 'a) and 
+             'a : (static member One : 'a) and 
+             'a : (static member ( + ) : 'a * 'a -> 'a) and 
+             'a : comparison

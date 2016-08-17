@@ -50,4 +50,40 @@ vectorSubtract.Format() |> printfn "vectorSub: \n%s"
 
 // Inner production
 let vectorInnerProduct = Vector.InnerProduct vec1 vec2
-vectorInnerProduct.Format() |> printfn "vectorInnerProduct: \n%s"
+vectorInnerProduct.ToString() |> printfn "vectorInnerProduct: \n%s"
+
+// Size - int32
+let sizeInt32Vector = vector<int32>([| 3; 4 |])
+Vector.SizeInt32 sizeInt32Vector |> printfn "Size of %s is: \n%d" (sizeInt32Vector.Format())
+
+// Size - int64
+let sizeInt64Vector = vector<int64>([| 3L; 4L |])
+Vector.SizeInt64 sizeInt64Vector |> printfn "Size of %s is: \n%d" (sizeInt32Vector.Format())
+
+// Size - float32
+let sizeFloat32Vector = vector<float32>([| 3.2f; 4.1f |])
+Vector.SizeFloat32 sizeFloat32Vector |> printfn "Size of %s is: \n%A" (sizeFloat32Vector.Format())
+
+// Size - int32
+let sizeDoubleVector = vector<double>([| 2.5; 4.7; 5.6 |])
+Vector.SizeDouble sizeDoubleVector |> printfn "Size of %s is: \n%A" (sizeDoubleVector.Format())
+
+// Zero vector creation
+let zeroVector = Vector.ZeroVector<decimal> 3
+zeroVector.Format() |> printfn "zeroVector: \n%s"
+
+// Unit vector creation
+let unitVector = Vector.UnitVector 5 3 1.0
+unitVector.Format() |> printfn "unitVector: \n%s"
+
+// Check unit vector
+let nonUnitVector = vector<float>([| 1.2; 2.1; 0.0 |])
+let unitVector2 = vector<float>([| 0.5; -0.5; 0.5; -0.5 |])
+if Vector.IsUnitVector nonUnitVector then 
+    printfn "ERROR! This is not unit vector: \n%s" (nonUnitVector.Format()) 
+else 
+    printfn "CORRECT! This is not unit vector: \n%s" (nonUnitVector.Format())
+if Vector.IsUnitVector unitVector then
+    printfn "CORRECT! This is unit vector: \n%s" (unitVector2.Format())
+else
+    printfn "ERROR! This is unit vector: \n%s" (unitVector2.Format())
