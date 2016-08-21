@@ -57,6 +57,7 @@
     <Compile Include="Vector.fs" />
     <None Include="Script.fsx" />
     <None Include="ReadmeScript.fsx" />
+    <None Include="TestScript.fsx" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

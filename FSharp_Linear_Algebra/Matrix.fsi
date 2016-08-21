@@ -53,7 +53,7 @@ module Matrix =
     val inline Add : matrix1 : 'T matrix -> matrix2 : 'T matrix -> 'T matrix
         when 'T : (static member (+) : 'T * 'T -> 'T)
 
-    /// <summary>Subtract one matrix from another.</summary>B
+    /// <summary>Subtract one matrix from another.</summary>
     /// <param name="matrix1">Matrix to be subtracted from. Left side.</param>
     /// <param name="matrix2">Matrix to subtract. Right side. </param>
     /// <returns>Returns the subtraction result of two matrices.</returns>
