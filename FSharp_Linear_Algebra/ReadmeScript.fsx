@@ -2,6 +2,11 @@
 #load "Vector.fs"
 open FSharp_Linear_Algebra
 
+// Some helper functions
+let fst3 (a, _, _) = a
+let snd3 (_, b, _) = b
+let thd3 (_, _, c) = c
+
 // Matrix initialization.
 let matrix1 = matrix<decimal>([| [| 2M; 1M; 1M; |]; [| 4M; -6M; 0M; |]; [| -2M; 7M; 2M; |] |])
 let matrix2 = matrix<decimal>([| [| 1M; 1M; 1M; |]; [| 2M; 2M; 5M; |]; [| 4M; 6M; 8M; |] |])
@@ -32,7 +37,10 @@ matrixIdentity.Format() |> printfn "matrixIdentity: \n%s"
 
 // Gauss elimination
 let matrixGaussEliminate = Matrix.GaussEliminate matrix1
-matrixGaussEliminate.Format() |> printfn "matrixGaussEliminate: \n%s"
+printfn "matrixGaussEliminate(PA=LU):"
+(fst3 matrixGaussEliminate).Format() |> printfn "P(permutation matrix): \n%s"
+(snd3 matrixGaussEliminate).Format() |> printfn "L(Lower triangular matrix): \n%s"
+(thd3 matrixGaussEliminate).Format() |> printfn "U(Upper triangular matrix): \n%s"
 
 //---------------------------------------------------------------------------
 

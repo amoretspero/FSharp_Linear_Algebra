@@ -3,6 +3,7 @@
 open System
 open System.Collections
 open System.Collections.Generic
+open System.Linq
 open System.Numerics
 
 /// <summary>Exception that indicates gauss elimination of given matrix is not possible.</summary>
@@ -143,11 +144,16 @@ module Matrix =
 
     /// <summary>Gauss eliminates given decimal matrix.</summary>
     /// <param name="mat">Matrix to be eliminated.</param>
-    /// <returns>Returns eliminated result.</returns>
+    /// <returns>Returns eliminated result. For elimination of PA=LU, return value is (P * L * U), three-tuple.</returns>
     /// <exception cref="FSharp_Linear_Algebra.NoGaussEliminationPossible">Thrown when gauss elimination cannot be performed.</exception>
-    let inline GaussEliminate (mat : 'T matrix) : 'T matrix =
+    let inline GaussEliminate (mat : 'T matrix) : 'T matrix * 'T matrix * 'T matrix =
+        let fst3 (a, _, _) = a
+        let snd3 (_, b, _) = b
+        let thd3 (_, _, c) = c
         do if mat.columnCnt <> mat.rowCnt then raise (NotSquare(mat.columnCnt, mat.rowCnt)) // Check if matrix is square.
         let mutable cnt = 0
+        let ratios = ref ([| |] : (int * int * 'T) []) // Keeps the ratios for row subtraction. This will be used to construct L of Elimination.
+        let permutations = ref ([| |] : (int * int) []) // Keeps the permutation informations. This will be used to construct P of Elimination.
         while (cnt < mat.rowCnt) do
             let checkPivot = mat.element.[cnt, cnt] <> LanguagePrimitives.GenericZero // Check the pivot of row.
             if checkPivot then // If pivot exists, i.e., not zero, eliminate one step.
@@ -155,6 +161,7 @@ module Matrix =
                     let tmp1 = mat.element.[idx1, cnt]
                     let tmp2 = mat.element.[cnt, cnt]
                     let ratio = mat.element.[idx1, cnt] / mat.element.[cnt, cnt] // Ratio of pivot and below-pivot element of row that is to be modified.
+                    ratios.Value <- Array.append ratios.Value [| (cnt, idx1, ratio) |] // Add ratio to array of them.
                     for idx2 = cnt to mat.rowCnt-1 do
                         mat.element.[idx1, idx2] <- mat.element.[idx1, idx2] - mat.element.[cnt, idx2] * ratio
                 cnt <- cnt + 1
@@ -168,10 +175,32 @@ module Matrix =
                     raise NoGaussEliminationPossible
                 else // When row is available for cure.
                     findPivot <- findPivot - 1
+                    permutations.Value <- Array.append permutations.Value [| (cnt, findPivot) |] // Add permutation information.
                     let mutable changeRowCnt = 0
                     while (changeRowCnt < mat.rowCnt) do // Change current row with found one.
                         let changeRowTemp = mat.element.[cnt, changeRowCnt]
                         mat.element.[cnt, changeRowCnt] <- mat.element.[findPivot, changeRowCnt]
                         mat.element.[findPivot, changeRowCnt] <- changeRowTemp
                         changeRowCnt <- changeRowCnt + 1
-        mat
+                    // Change row and column information in ratios array also.
+                    ratios.Value <- Array.map (fun x -> 
+                                                    let mutable newRow = fst3 x
+                                                    let mutable newCol = snd3 x
+                                                    if (fst3 x) = cnt then newRow <- findPivot
+                                                    else if (fst3 x) = findPivot then newRow <- cnt
+                                                    if (snd3 x) = cnt then newCol <- findPivot
+                                                    else if (snd3 x) = findPivot then newCol <- cnt
+                                                    (newRow, newCol, (thd3 x))) ratios.Value
+        let lowerMatrix = Identity mat.rowCnt LanguagePrimitives.GenericOne<'T>
+        let permutationMatrix = Identity mat.rowCnt LanguagePrimitives.GenericOne<'T>
+        for ratio in ratios.Value do 
+            Array2D.set lowerMatrix.element (snd3 ratio) (fst3 ratio) (thd3 ratio) // Set lower matrix.
+        for permutation in permutations.Value do // Set permutation matrix.
+            let mutable colCnt = 0
+            let target1 = fst permutation
+            let target2 = snd permutation
+            while (colCnt < mat.columnCnt) do
+                let targetTemp = permutationMatrix.element.GetValue(target2, colCnt)
+                permutationMatrix.element.SetValue(permutationMatrix.element.GetValue(target1, colCnt), target2, colCnt)
+                permutationMatrix.element.SetValue(targetTemp, target1, colCnt)
+        (permutationMatrix, lowerMatrix, mat)

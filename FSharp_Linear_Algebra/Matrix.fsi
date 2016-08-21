@@ -85,12 +85,18 @@ module Matrix =
     /// <param name="mat">Matrix to be eliminated.</param>
     /// <returns>Returns eliminated result.</returns>
     /// <exception cref="FSharp_Linear_Algebra.NoGaussEliminationPossible">Thrown when gauss elimination cannot be performed.</exception>
-    val inline GaussEliminate : mat:matrix<'T> -> matrix<'T> 
-        when 'T : equality and 
-             'T : (static member Zero : 'T) and 
-             'T : (static member ( / ) : 'T * 'T -> 'a) and 
-             ('T or 'b) : (static member ( - ) : 'T * 'b -> 'T) and 
-             ('T or 'a) : (static member ( * ) : 'T * 'a -> 'b)
+    val inline GaussEliminate : mat:matrix<'T> -> matrix<'T> * matrix<'T> * matrix<'T>
+        when 'T : (static member Zero : 'T) and 
+             'T : (static member ( / ) : 'T * 'T -> 'T) and 
+             ('T or 'a) : (static member ( - ) : 'T * 'a -> 'T) and 
+             'T : (static member ( * ) : 'T * 'T -> 'a) and 
+             'T : (static member One : 'T) and 
+             'T : comparison
+        //when 'T : equality and 
+        //     'T : (static member Zero : 'T) and 
+        //     'T : (static member ( / ) : 'T * 'T -> 'a) and 
+        //     ('T or 'b) : (static member ( - ) : 'T * 'b -> 'T) and 
+        //     ('T or 'a) : (static member ( * ) : 'T * 'a -> 'b)
 
 
 
