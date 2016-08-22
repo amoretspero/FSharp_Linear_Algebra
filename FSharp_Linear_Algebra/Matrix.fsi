@@ -37,6 +37,20 @@ type matrix<'T> =
 /// <summary>Module for operations on matrices.</summary>
 module Matrix =
 
+    /// <summary>Write matrix to file.</summary>
+    /// <param name="location">File location to write matrix.</param>
+    val WriteToFile : mat : 'T matrix -> location : string -> unit
+
+    /// <summary>Reads int32 matrix from file. Input file should contain one row at one line.
+    /// Whitespace or tab seperators are both legal.</summary>
+    /// <param name="location">File location to read matrix from.</param>
+    val ReadFromFileInt32 : location : string -> int32 matrix
+
+    /// <summary>Reads double matrix from file. Input file should contain one row at one line.
+    /// Whitespace or tab seperators are both legal.</summary>
+    /// <param name="location">File location to read matrix from.</param>
+    val ReadFromFileDouble : location : string -> double matrix
+
     /// <summary>Multiplies matrix1 with matrix2 and returns its result.</summary>
     /// <param name="matrix1">Matrix to be multiplied. Left side.</param>
     /// <param name="matrix2">Matrix to be multiplied. Right side.</param>

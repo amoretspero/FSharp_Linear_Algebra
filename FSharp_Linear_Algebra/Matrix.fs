@@ -10,6 +10,7 @@ open System.Numerics
 exception NoGaussEliminationPossible
 exception SizeUnmatch of int * int * int * int
 exception NotSquare of int * int
+exception FileNotFound of string
 
 /// <summary>Class for generic matrices.</summary>
 type matrix<'T>(rowCnt : int, columnCnt : int, element : 'T [,]) =
@@ -38,6 +39,8 @@ type matrix<'T>(rowCnt : int, columnCnt : int, element : 'T [,]) =
 
     // Instance methods ---------------------------------------------
 
+    /// <summary>Formats matrix to string, with tab seperator.</summary>
+    /// <returns>Formatted matrix, one row in one line.</returns>
     member mat.Format() =
         let sb = System.Text.StringBuilder()
         for i = 1 to _rowCnt do
@@ -45,6 +48,8 @@ type matrix<'T>(rowCnt : int, columnCnt : int, element : 'T [,]) =
                 sb.AppendFormat("{0}\t", _element.[i - 1, j - 1]) |> ignore
             sb.AppendLine() |> ignore
         sb.ToString()
+
+    
 
     // Static properties --------------------------------------------
 
@@ -77,6 +82,38 @@ type matrix<'T>(rowCnt : int, columnCnt : int, element : 'T [,]) =
 
 /// <summary>Module for operations on matrices.</summary>
 module Matrix =
+    
+    /// <summary>Write matrix to file.</summary>
+    /// <param name="location">File location to write matrix.</param>
+    let WriteToFile (mat : 'T matrix) (location : string) =
+        let formatted = mat.Format()
+        System.IO.File.WriteAllText(location, formatted)
+
+    /// <summary>Reads int32 matrix from file. Input file should contain one row at one line.
+    /// Whitespace or tab seperators are both legal.</summary>
+    /// <param name="location">File location to read matrix from.</param>
+    let ReadFromFileInt32 (location : string) : int32 matrix =
+        if not (System.IO.File.Exists(location)) then raise (FileNotFound("File not found : " + location))
+        let raw = System.IO.File.ReadAllLines(location)
+        let midArray = Array.map (fun (x : string) -> x.Split([| " "; "\t"; System.Environment.NewLine |], StringSplitOptions.RemoveEmptyEntries)) raw
+        if (midArray.Length <= 0) then failwith "Matrix file is empty."
+        let firstLen = midArray.[0].Length
+        for elem in midArray do
+            if elem.Length <> firstLen then failwith "All rows should have same length."
+        matrix<int32>(Array.map (fun (x : string []) -> Array.map (fun (y : string) -> System.Convert.ToInt32(y)) x) midArray)
+
+    /// <summary>Reads double matrix from file. Input file should contain one row at one line.
+    /// Whitespace or tab seperators are both legal.</summary>
+    /// <param name="location">File location to read matrix from.</param>
+    let ReadFromFileDouble (location : string) : double matrix =
+        if not (System.IO.File.Exists(location)) then raise (FileNotFound("File not found : " + location))
+        let raw = System.IO.File.ReadAllLines(location)
+        let midArray = Array.map (fun (x : string) -> x.Split([| " "; "\t"; System.Environment.NewLine |], StringSplitOptions.RemoveEmptyEntries)) raw
+        if (midArray.Length <= 0) then failwith "Matrix file is empty."
+        let firstLen = midArray.[0].Length
+        for elem in midArray do
+            if elem.Length <> firstLen then failwith "All rows should have same length."
+        matrix<double>(Array.map (fun (x : string []) -> Array.map (fun (y : string) -> System.Convert.ToDouble(y)) x) midArray)
 
     /// <summary>Multiplies matrix1 with matrix2 and returns its result.</summary>
     /// <param name="matrix1">Matrix to be multiplied. Left side.</param>
@@ -204,3 +241,21 @@ module Matrix =
                 permutationMatrix.element.SetValue(permutationMatrix.element.GetValue(target1, colCnt), target2, colCnt)
                 permutationMatrix.element.SetValue(targetTemp, target1, colCnt)
         (permutationMatrix, lowerMatrix, mat)
+
+    /// <summary>Generates int32 random matrix of given size.</summary>
+    /// <param name="row">Number of rows.</param>
+    /// <param name="col">Number of columns.</param>
+    /// <returns>Returns generated row*col size matrix.</returns>
+    let RandomMatrixInt32 (row : int) (col : int) : int32 matrix =
+        let rnd = new System.Random()
+        let elem = Array2D.init row col (fun _ _ -> rnd.Next())
+        matrix<int32>(row, col, elem)
+
+    /// <summary>Generates double matrix of given size.</summary>
+    /// <param name="row">Number of rows.</param>
+    /// <param name="col">Number of columns.</param>
+    /// <returns>Returns generated row*col size matrix.</returns>
+    let RandomMatrixDouble (row : int) (col : int) : double matrix =
+        let rnd = new System.Random()
+        let elem = Array2D.init row col (fun _ _ -> rnd.NextDouble())
+        matrix<double>(row, col, elem)

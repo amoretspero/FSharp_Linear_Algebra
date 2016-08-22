@@ -54,3 +54,6 @@ let matAddParam1 = matrix<int>([| [| 1; 4; 3 |]; [| -3; 5; 1 |]; [| 2; 6; -2 |];
 let matAddParam2 = matrix<int>([| [| 15; -24; 98 |]; [| 47; 82; -27 |]; [| 2; -41; 78 |]; [| 63; 51; -9 |] |])
 
 let matAddRef1 = matrix<int>([| [| 16; -20; 101 |]; [| 44; 87; -26 |]; [| 4; -35; 76 |]; [| 60; 44; -8 |] |])
+
+printPrologue("Addition")
+compareTrue (Matrix.Add matAddParam1 matAddParam2) matAddRef1

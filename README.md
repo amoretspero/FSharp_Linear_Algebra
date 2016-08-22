@@ -1,11 +1,16 @@
-#FSharp Linear Algebra  
+# FSharp Linear Algebra  
 Library for linear algebra made with F#.  
   
-##Version  
-Current : **0.3.1.0**  
-Status : **Unstable**  
+## Version  
+**Unstable** : **0.3.2.0**  
+**Stable** : **0.3.0.0**   
   
-##Update History  
+## Update History  
+  
+### 0.3.1.0 -> 0.3.2.0  
+  
+- For matrices, read from file(<code>int32</code>, <code>double</code> types only.) and write to file(all types) are supported.  
+- Testing scripts are in progress.  
   
 ### 0.3.0.0 -> 0.3.1.0  
   
@@ -17,20 +22,20 @@ Status : **Unstable**
 - Added zero vector, unit vector creator.  
 - Added method to check if given vector is unit vector.  
   
-##Description  
+## Description  
 This project is to provide F#-made linear algebra library.  
 Support will mainly include matrix and vector computation.  
 Also, most of objects will be generic, meaning you can use this library with types you want.  
 Currently, no optimization is provided.
   
-##Supported Features  
+## Supported Features  
   
-###Matrix  
+### Matrix  
 **Construction** : You can create matrix with three options.  
 1) Basic constructor - <code>(rowCnt : int, columnCnt : int, element : 'T [,])</code>  
 2) Zero matrix constructor - <code>(rowCnt : int, columnCnt : int, zero : 'T)</code>  
 3) Constructor with Array2D. - <code>(elem : 'T [] [])</code>  
-```
+```fsharp
 // First constructor. Should provide type.
 let matrix1 = matrix<int>(3, 7, (Array2D.init 3 7 (fun idx1 idx2 -> idx1 * idx2 - 1)))
 
@@ -42,7 +47,7 @@ let matrix3 = matrix<float>([| [| 1.334; 8.461; 9.361; 2.904; 5.837 |]; [| 0.948
 ```  
 
 **Stringify** : <code>Format()</code> method.  
-```
+```fsharp
 let mat = matrix<float>([| [| 1.334; 8.461; 9.361; 2.904; 5.837 |]; [| 0.948; 8.847; 6.372; 4.981; 7.829 |]; [| 1.938; 3.284; 8.944; 5.748; 2.987 |] |])
 mat.Format() |> printfn "Matrix formatted: \n%s"
 (*
@@ -55,6 +60,11 @@ Matrix formatted:
 
 *)
 ```  
+  
+**File I/O** : You can write to or read from files.  
+1) Write to file - <code>Matrix.WriteToFile()</code>  
+2) Read from file (<code>int32</code>) - <code>Matrix.ReadFromFileInt32()</code>
+3) Read from file (<code>double</code>) - <code>Matrix.ReadFromFileDouble()</code>  
 
 **Computation** : You can perform basic matrix computations.  
 1) Addition - <code>Matrix.Add()</code>  
@@ -64,7 +74,7 @@ Matrix formatted:
 5) Scalar multiplication - <code>Matrix.ScalarMultiply()</code>  
 6) Identity matrix - <code>Matrix.Identity()</code>  
 7) Gauss Elimination - <code>Matrix.GaussEliminate()</code>  
-```
+```fsharp
 // Matrix initialization.
 let matrix1 = matrix<decimal>([| [| 2M; 1M; 1M; |]; [| 4M; -6M; 0M; |]; [| -2M; 7M; 2M; |] |])
 let matrix2 = matrix<decimal>([| [| 1M; 1M; 1M; |]; [| 2M; 2M; 5M; |]; [| 4M; 6M; 8M; |] |])
@@ -138,16 +148,16 @@ matrixGaussEliminate:
 *)
 ```
   
-###Vector  
+### Vector  
 **Construction** : You can create vector with one option.  
 1) Basic constructor - <code>(element : 'T [])</code>  
-```
+```fsharp
 // Basic constructor. Should provide type.
 let vector1 = vector<int>([| 1; 2; 3; 4; 5 |])
 ```  
 
 **Stringify** : <code>Format()</code> method.  
-```
+```fsharp
 let vector2 = vector<decimal>([| 1.0M; 1.5M; -2.0M |])
 vector2.Format() |> printfn "vector2: %s\n"
 
@@ -170,7 +180,7 @@ Output:
 8) Unit vector check - <code>Vector.IsUnitVector()</code>  
 9) Zero vector constructor - <code>Vector.ZeroVector()</code>  
 10) Unit vector constructor - <code>Vector.UnitVector()</code>  
-```
+```fsharp
 // Vector initialization
 let vec1 = vector<decimal>([| 1.0M; 2.0M; 3.0M; |])
 let vec2 = vector<decimal>([| 2.0M; -1.5M; -2.0M; |])
