@@ -1,4 +1,4 @@
-﻿namespace FSharp_Linear_Algebra
+﻿namespace FSharp_Linear_Algebra.Matrix
 
 open System
 open System.Collections
@@ -13,6 +13,7 @@ exception NotSquare of int * int
 exception FileNotFound of string
 
 /// <summary>Class for generic matrices.</summary>
+[<Class>]
 type matrix<'T>(rowCnt : int, columnCnt : int, element : 'T [,]) =
 
     // Private data -------------------------------------------------
@@ -78,6 +79,52 @@ type matrix<'T>(rowCnt : int, columnCnt : int, element : 'T [,]) =
         let columnCnt = elem.[0].Length
         let array2d = elem |> array2D
         matrix<'T>(rowCnt, columnCnt, array2d)
+
+
+///<summary>Class for random-generated matrices.</summary>
+[<Class>]
+type RandomMatrix () =
+    
+    /// <summary>Generates Byte random matrix of given size.</summary>
+    /// <param name="row">Number of rows.</param>
+    /// <param name="col">Number of columns.</param>
+    /// <returns>Returns generated row*col size matrix.</returns>
+    member rm.RandomMatrixByte (row : int) (col : int) : Byte matrix =
+        let rnd = new System.Random()
+        let elem = Array2D.init row col (fun _ _ -> 
+                                                    let buf = [| 0uy |]
+                                                    rnd.NextBytes(buf)
+                                                    buf.First())
+        matrix<byte>(row, col, elem)
+
+    
+    /// <summary>Generates int32 random matrix of given size.</summary>
+    /// <param name="row">Number of rows.</param>
+    /// <param name="col">Number of columns.</param>
+    /// <returns>Returns generated row*col size matrix.</returns>
+    member rm.RandomMatrixInt32 (row : int) (col : int) : Int32 matrix =
+        let rnd = new System.Random()
+        let elem = Array2D.init row col (fun _ _ -> rnd.Next())
+        matrix<int32>(row, col, elem)
+
+    /// <summary>Generates int64 random matrix of given size.</summary>
+    /// <param name="row">Number of rows.</param>
+    /// <param name="col">Number of columns.</param>
+    /// <returns>Returns generated row*col size matrix.</returns>
+    member rm.RandomMatrixInt64 (row : int) (col : int) : Int64 matrix =
+        let rnd = new System.Random()
+        let elem = Array2D.init row col (fun _ _ -> ((int64)(rnd.Next()) <<< 32) + (int64)(rnd.Next()))
+        matrix<int64>(row, col, elem)
+
+    /// <summary>Generates double matrix of given size.</summary>
+    /// <param name="row">Number of rows.</param>
+    /// <param name="col">Number of columns.</param>
+    /// <returns>Returns generated row*col size matrix.</returns>
+    member rm.RandomMatrixDouble (row : int) (col : int) : double matrix =
+        let rnd = new System.Random()
+        let elem = Array2D.init row col (fun _ _ -> rnd.NextDouble())
+        matrix<double>(row, col, elem)
+
         
 
 /// <summary>Module for operations on matrices.</summary>
@@ -241,21 +288,3 @@ module Matrix =
                 permutationMatrix.element.SetValue(permutationMatrix.element.GetValue(target1, colCnt), target2, colCnt)
                 permutationMatrix.element.SetValue(targetTemp, target1, colCnt)
         (permutationMatrix, lowerMatrix, mat)
-
-    /// <summary>Generates int32 random matrix of given size.</summary>
-    /// <param name="row">Number of rows.</param>
-    /// <param name="col">Number of columns.</param>
-    /// <returns>Returns generated row*col size matrix.</returns>
-    let RandomMatrixInt32 (row : int) (col : int) : int32 matrix =
-        let rnd = new System.Random()
-        let elem = Array2D.init row col (fun _ _ -> rnd.Next())
-        matrix<int32>(row, col, elem)
-
-    /// <summary>Generates double matrix of given size.</summary>
-    /// <param name="row">Number of rows.</param>
-    /// <param name="col">Number of columns.</param>
-    /// <returns>Returns generated row*col size matrix.</returns>
-    let RandomMatrixDouble (row : int) (col : int) : double matrix =
-        let rnd = new System.Random()
-        let elem = Array2D.init row col (fun _ _ -> rnd.NextDouble())
-        matrix<double>(row, col, elem)

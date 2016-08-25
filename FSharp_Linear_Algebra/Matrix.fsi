@@ -1,4 +1,4 @@
-﻿namespace FSharp_Linear_Algebra
+﻿namespace FSharp_Linear_Algebra.Matrix
 
 /// <summary>Exception that indicates gauss elimination of given matrix is not possible.</summary>
 exception NoGaussEliminationPossible
@@ -32,6 +32,21 @@ type matrix<'T> =
     /// <summary>Format the matrix.</summary>
     member Format : unit -> string
 
+///<summary>Class for random-generated matrices.</summary>
+[<Class>]
+type RandomMatrix =
+    
+    /// <summary>Generates int32 random matrix of given size.</summary>
+    /// <param name="row">Number of rows.</param>
+    /// <param name="col">Number of columns.</param>
+    /// <returns>Returns generated row*col size matrix.</returns>
+    member RandomMatrixInt32 : row : int -> col : int -> int32 matrix
+
+    /// <summary>Generates double matrix of given size.</summary>
+    /// <param name="row">Number of rows.</param>
+    /// <param name="col">Number of columns.</param>
+    /// <returns>Returns generated row*col size matrix.</returns>
+    member RandomMatrixDouble : row : int -> col : int -> double matrix
 
 
 /// <summary>Module for operations on matrices.</summary>
@@ -106,11 +121,3 @@ module Matrix =
              'T : (static member ( * ) : 'T * 'T -> 'a) and 
              'T : (static member One : 'T) and 
              'T : comparison
-        //when 'T : equality and 
-        //     'T : (static member Zero : 'T) and 
-        //     'T : (static member ( / ) : 'T * 'T -> 'a) and 
-        //     ('T or 'b) : (static member ( - ) : 'T * 'b -> 'T) and 
-        //     ('T or 'a) : (static member ( * ) : 'T * 'a -> 'b)
-
-
-

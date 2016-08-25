@@ -2,7 +2,7 @@
 #load "Vector.fs"
 #r ".\\bin\\Debug\\MathNet.Numerics.dll"
 
-open FSharp_Linear_Algebra
+open FSharp_Linear_Algebra.Matrix
 open MathNet.Numerics
 
 // Test settings. - Helper functions, global variables, etc.
@@ -109,8 +109,8 @@ printPrologue("Subtraction")
 compareTrue (Matrix.Subtract matSubtractParam1 matSubtractParam2) matSubtractRef1
 
 // Matrix Addition/Subtraction tests.
-let matAddSubParam1 = Matrix.RandomMatrixDouble 128 128
-let matAddSubParam2 = Matrix.RandomMatrixDouble 128 128
+let matAddSubParam1 = RandomMatrix().RandomMatrixDouble 128 128
+let matAddSubParam2 = RandomMatrix().RandomMatrixDouble 128 128
 
 printPrologue("Addition/Subtraction")
 compareDoubleTrue (Matrix.Add (Matrix.Subtract matAddSubParam1 matAddSubParam2) matAddSubParam2) matAddSubParam1 doublePrecision
@@ -119,8 +119,8 @@ printPrologue("Addition/Subtraction")
 compareDoubleTrue (Matrix.Subtract (Matrix.Add matAddSubParam1 matAddSubParam2) matAddSubParam2) matAddSubParam1 doublePrecision
 
 // Matrix Multiplication tests.
-let matMultParam1 = Matrix.RandomMatrixDouble 128 128
-let matMultParam2 = Matrix.RandomMatrixDouble 128 128
+let matMultParam1 = RandomMatrix().RandomMatrixDouble 128 128
+let matMultParam2 = RandomMatrix().RandomMatrixDouble 128 128
 
 let matMultRef1 = matrix<double>(matMultParam1.rowCnt, matMultParam2.columnCnt, (MathNet.Numerics.LinearAlgebra.Matrix.Build.DenseOfArray(matMultParam1.element).Multiply(MathNet.Numerics.LinearAlgebra.Matrix.Build.DenseOfArray(matMultParam2.element)).Storage.ToArray()))
 
