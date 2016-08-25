@@ -10,6 +10,15 @@ let mutable total = 0
 let mutable passed = 0
 let mutable failed = 0
 
+let first3 (a, _, _) = a
+let second3 (_, b, _) = b
+let third3 (_, _, c) = c
+
+let first4 (a, _, _, _) = a
+let second4 (_, b, _, _) = b
+let third4 (_, _, c, _) = c
+let fourth4 (_, _, _, d) = d
+
 let doublePrecision = 1.0E-8
 
 type TestType =
@@ -127,8 +136,18 @@ let matMultRef1 = matrix<double>(matMultParam1.rowCnt, matMultParam2.columnCnt, 
 printPrologue("Multiplication")
 compareDoubleTrue (Matrix.Multiply matMultParam1 matMultParam2) matMultRef1 doublePrecision
 
-//let test = MathNet.Numerics.LinearAlgebra.Matrix<decimal>.Build.Random(3, 3)
-//printfn "Decimal random matrix: \n%A" (test.ToString())
+// Gauss Elimination - LU decomposition test.
+
+let test = RandomMatrix().RandomMatrixDouble 5 5
+let testRef = MathNet.Numerics.LinearAlgebra.Matrix.Build.DenseOfArray(test.element)
+
+let testLU = Matrix.LDUdecomposition test
+let testRefLU = testRef.LU()
+
+printfn "testLU - L: \n%A" ((second4 testLU).Format())
+printfn "testLU - U: \n%A" ((fourth4 testLU).Format())
+printfn "testRefLU - L: \n%A" (testRefLU.L.ToString())
+printfn "testRefLU - U: \n%A" (testRefLU.U.ToString())
 
 // End test.
 endTest()

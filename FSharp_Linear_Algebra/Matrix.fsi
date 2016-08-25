@@ -1,7 +1,7 @@
 ﻿namespace FSharp_Linear_Algebra.Matrix
 
 /// <summary>Exception that indicates gauss elimination of given matrix is not possible.</summary>
-exception NoGaussEliminationPossible
+exception NoLDUDecompositionPossible
 
 [<Class>]
 /// <summary>Class for generic matrices.</summary>
@@ -138,7 +138,7 @@ module Matrix =
     /// <param name="mat">Matrix to be eliminated.</param>
     /// <returns>Returns eliminated result.</returns>
     /// <exception cref="FSharp_Linear_Algebra.NoGaussEliminationPossible">Thrown when gauss elimination cannot be performed.</exception>
-    val inline GaussEliminate : mat:matrix<'T> -> matrix<'T> * matrix<'T> * matrix<'T>
+    val inline LDUdecomposition : mat:matrix<'T> -> matrix<'T> * matrix<'T> * matrix<'T> * matrix<'T>
         when 'T : (static member Zero : 'T) and 
              'T : (static member ( / ) : 'T * 'T -> 'T) and 
              ('T or 'a) : (static member ( - ) : 'T * 'a -> 'T) and 

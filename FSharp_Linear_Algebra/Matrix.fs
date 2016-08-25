@@ -7,7 +7,7 @@ open System.Linq
 open System.Numerics
 
 /// <summary>Exception that indicates gauss elimination of given matrix is not possible.</summary>
-exception NoGaussEliminationPossible
+exception NoLDUDecompositionPossible
 exception SizeUnmatch of int * int * int * int
 exception NotSquare of int * int
 exception FileNotFound of string
@@ -245,45 +245,50 @@ module Matrix =
             res.[i-1, i-1] <- one // Only diagonal elements should be one.
         matrix<'T>(size, size, res)
 
-    /// <summary>Gauss eliminates given decimal matrix.</summary>
-    /// <param name="mat">Matrix to be eliminated.</param>
-    /// <returns>Returns eliminated result. For elimination of PA=LU, return value is (P * L * U), three-tuple.</returns>
-    /// <exception cref="FSharp_Linear_Algebra.NoGaussEliminationPossible">Thrown when gauss elimination cannot be performed.</exception>
-    let inline GaussEliminate (mat : 'T matrix) : 'T matrix * 'T matrix * 'T matrix =
+    /// <summary>LDU-decompose given matrix.</summary>
+    /// <param name="mat">Matrix to be decomposed.</param>
+    /// <returns>Returns decomposed result. For decomposition of PA=LDU, return value is (P * L * D * U), four-tuple.</returns>
+    /// <exception cref="FSharp_Linear_Algebra.NoLDUDecompositionPossible">Thrown whenLDU decomposition cannot be performed.</exception>
+    let inline LDUdecomposition (mat : 'T matrix) : 'T matrix * 'T matrix * 'T matrix * 'T matrix =
         let fst3 (a, _, _) = a
         let snd3 (_, b, _) = b
         let thd3 (_, _, c) = c
         do if mat.columnCnt <> mat.rowCnt then raise (NotSquare(mat.columnCnt, mat.rowCnt)) // Check if matrix is square.
+        let upperMatrix = matrix<'T>(mat.rowCnt, mat.columnCnt, mat.element) // Copies input matrix.
         let mutable cnt = 0
         let ratios = ref ([| |] : (int * int * 'T) []) // Keeps the ratios for row subtraction. This will be used to construct L of Elimination.
         let permutations = ref ([| |] : (int * int) []) // Keeps the permutation informations. This will be used to construct P of Elimination.
-        while (cnt < mat.rowCnt) do
-            let checkPivot = mat.element.[cnt, cnt] <> LanguagePrimitives.GenericZero // Check the pivot of row.
+        let diagonals = ref ([| |] : (int * int * 'T) []) // Keeps the diagonals produced. This will be used to construct D of Elimination.
+        while (cnt < upperMatrix.rowCnt) do
+            let checkPivot = upperMatrix.element.[cnt, cnt] <> LanguagePrimitives.GenericZero // Check the pivot of row.
             if checkPivot then // If pivot exists, i.e., not zero, eliminate one step.
-                for idx1 = cnt+1 to mat.rowCnt-1 do
-                    let tmp1 = mat.element.[idx1, cnt]
-                    let tmp2 = mat.element.[cnt, cnt]
-                    let ratio = mat.element.[idx1, cnt] / mat.element.[cnt, cnt] // Ratio of pivot and below-pivot element of row that is to be modified.
+                let pivot = upperMatrix.element.[cnt, cnt]
+                diagonals.Value <- Array.append diagonals.Value [| (cnt, cnt, pivot) |] // Preserve dianogal information.
+                for idx1 = cnt+1 to upperMatrix.rowCnt-1 do
+                    let tmp1 = upperMatrix.element.[idx1, cnt]
+                    let tmp2 = upperMatrix.element.[cnt, cnt]
+                    let ratio = upperMatrix.element.[idx1, cnt] / upperMatrix.element.[cnt, cnt] // Ratio of pivot and below-pivot element of row that is to be modified.
                     ratios.Value <- Array.append ratios.Value [| (cnt, idx1, ratio) |] // Add ratio to array of them.
-                    for idx2 = cnt to mat.rowCnt-1 do
-                        mat.element.[idx1, idx2] <- mat.element.[idx1, idx2] - mat.element.[cnt, idx2] * ratio
+                    for idx2 = cnt to upperMatrix.rowCnt-1 do
+                        upperMatrix.element.[idx1, idx2] <- upperMatrix.element.[idx1, idx2] - upperMatrix.element.[cnt, idx2] * ratio
+                for idx1 = cnt to upperMatrix.columnCnt - 1 do upperMatrix.element.[cnt, idx1] <- upperMatrix.element.[cnt, idx1] / pivot // Set pivot to 1.
                 cnt <- cnt + 1
             else // When pivot does not exists, try to cure.
                 let mutable findPivot = cnt + 1
                 let mutable findBreak = false
-                while (findPivot < mat.rowCnt && not findBreak) do // With below-pivot rows, find row that has appropriate pivot.
-                    if mat.element.[findPivot, cnt] <> LanguagePrimitives.GenericZero then findBreak <- true
+                while (findPivot < upperMatrix.rowCnt && not findBreak) do // With below-pivot rows, find row that has appropriate pivot.
+                    if upperMatrix.element.[findPivot, cnt] <> LanguagePrimitives.GenericZero then findBreak <- true
                     findPivot <- findPivot + 1
                 if not findBreak then // When no row is available for cure, raise exception.
-                    raise NoGaussEliminationPossible
+                    raise NoLDUDecompositionPossible
                 else // When row is available for cure.
                     findPivot <- findPivot - 1
                     permutations.Value <- Array.append permutations.Value [| (cnt, findPivot) |] // Add permutation information.
                     let mutable changeRowCnt = 0
                     while (changeRowCnt < mat.rowCnt) do // Change current row with found one.
-                        let changeRowTemp = mat.element.[cnt, changeRowCnt]
-                        mat.element.[cnt, changeRowCnt] <- mat.element.[findPivot, changeRowCnt]
-                        mat.element.[findPivot, changeRowCnt] <- changeRowTemp
+                        let changeRowTemp = upperMatrix.element.[cnt, changeRowCnt]
+                        upperMatrix.element.[cnt, changeRowCnt] <- upperMatrix.element.[findPivot, changeRowCnt]
+                        upperMatrix.element.[findPivot, changeRowCnt] <- changeRowTemp
                         changeRowCnt <- changeRowCnt + 1
                     // Change row and column information in ratios array also.
                     ratios.Value <- Array.map (fun x -> 
@@ -294,16 +299,19 @@ module Matrix =
                                                     if (snd3 x) = cnt then newCol <- findPivot
                                                     else if (snd3 x) = findPivot then newCol <- cnt
                                                     (newRow, newCol, (thd3 x))) ratios.Value
-        let lowerMatrix = Identity mat.rowCnt LanguagePrimitives.GenericOne<'T>
-        let permutationMatrix = Identity mat.rowCnt LanguagePrimitives.GenericOne<'T>
+        let lowerMatrix = Identity upperMatrix.rowCnt LanguagePrimitives.GenericOne<'T>
+        let diagonalMatrix = Identity upperMatrix.rowCnt LanguagePrimitives.GenericOne<'T>
+        let permutationMatrix = Identity upperMatrix.rowCnt LanguagePrimitives.GenericOne<'T>
         for ratio in ratios.Value do 
             Array2D.set lowerMatrix.element (snd3 ratio) (fst3 ratio) (thd3 ratio) // Set lower matrix.
+        for pivot in diagonals.Value do
+            Array2D.set diagonalMatrix.element (fst3 pivot) (snd3 pivot) (thd3 pivot) // Set diagonal matrix.
         for permutation in permutations.Value do // Set permutation matrix.
             let mutable colCnt = 0
             let target1 = fst permutation
             let target2 = snd permutation
-            while (colCnt < mat.columnCnt) do
+            while (colCnt < upperMatrix.columnCnt) do
                 let targetTemp = permutationMatrix.element.GetValue(target2, colCnt)
                 permutationMatrix.element.SetValue(permutationMatrix.element.GetValue(target1, colCnt), target2, colCnt)
                 permutationMatrix.element.SetValue(targetTemp, target1, colCnt)
-        (permutationMatrix, lowerMatrix, mat)
+        (permutationMatrix, lowerMatrix, diagonalMatrix, mat)
