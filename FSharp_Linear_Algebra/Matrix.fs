@@ -254,7 +254,7 @@ module Matrix =
         let snd3 (_, b, _) = b
         let thd3 (_, _, c) = c
         do if mat.columnCnt <> mat.rowCnt then raise (NotSquare(mat.columnCnt, mat.rowCnt)) // Check if matrix is square.
-        let upperMatrix = matrix<'T>(mat.rowCnt, mat.columnCnt, mat.element) // Copies input matrix.
+        let upperMatrix = matrix<'T>(mat.rowCnt, mat.columnCnt, Array2D.copy(mat.element)) // Copies input matrix.
         let mutable cnt = 0
         let ratios = ref ([| |] : (int * int * 'T) []) // Keeps the ratios for row subtraction. This will be used to construct L of Elimination.
         let permutations = ref ([| |] : (int * int) []) // Keeps the permutation informations. This will be used to construct P of Elimination.
@@ -263,6 +263,8 @@ module Matrix =
             let checkPivot = upperMatrix.element.[cnt, cnt] <> LanguagePrimitives.GenericZero // Check the pivot of row.
             if checkPivot then // If pivot exists, i.e., not zero, eliminate one step.
                 let pivot = upperMatrix.element.[cnt, cnt]
+                //let ratio = if cnt >= upperMatrix.rowCnt - 1 then LanguagePrimitives.GenericOne<'T> else upperMatrix.element.[cnt+1, cnt] / pivot
+                //if cnt < upperMatrix.rowCnt - 1 then ratios.Value <- Array.append ratios.Value [| (cnt, cnt+1, ratio) |]
                 diagonals.Value <- Array.append diagonals.Value [| (cnt, cnt, pivot) |] // Preserve dianogal information.
                 for idx1 = cnt+1 to upperMatrix.rowCnt-1 do
                     let tmp1 = upperMatrix.element.[idx1, cnt]
@@ -285,7 +287,7 @@ module Matrix =
                     findPivot <- findPivot - 1
                     permutations.Value <- Array.append permutations.Value [| (cnt, findPivot) |] // Add permutation information.
                     let mutable changeRowCnt = 0
-                    while (changeRowCnt < mat.rowCnt) do // Change current row with found one.
+                    while (changeRowCnt < upperMatrix.rowCnt) do // Change current row with found one.
                         let changeRowTemp = upperMatrix.element.[cnt, changeRowCnt]
                         upperMatrix.element.[cnt, changeRowCnt] <- upperMatrix.element.[findPivot, changeRowCnt]
                         upperMatrix.element.[findPivot, changeRowCnt] <- changeRowTemp
@@ -314,4 +316,4 @@ module Matrix =
                 let targetTemp = permutationMatrix.element.GetValue(target2, colCnt)
                 permutationMatrix.element.SetValue(permutationMatrix.element.GetValue(target1, colCnt), target2, colCnt)
                 permutationMatrix.element.SetValue(targetTemp, target1, colCnt)
-        (permutationMatrix, lowerMatrix, diagonalMatrix, mat)
+        (permutationMatrix, lowerMatrix, diagonalMatrix, upperMatrix)

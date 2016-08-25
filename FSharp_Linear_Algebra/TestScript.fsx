@@ -136,7 +136,7 @@ let matMultRef1 = matrix<double>(matMultParam1.rowCnt, matMultParam2.columnCnt, 
 printPrologue("Multiplication")
 compareDoubleTrue (Matrix.Multiply matMultParam1 matMultParam2) matMultRef1 doublePrecision
 
-// Gauss Elimination - LU decomposition test.
+// LDU decomposition test.
 
 let test = RandomMatrix().RandomMatrixDouble 5 5
 let testRef = MathNet.Numerics.LinearAlgebra.Matrix.Build.DenseOfArray(test.element)
@@ -144,10 +144,16 @@ let testRef = MathNet.Numerics.LinearAlgebra.Matrix.Build.DenseOfArray(test.elem
 let testLU = Matrix.LDUdecomposition test
 let testRefLU = testRef.LU()
 
-printfn "testLU - L: \n%A" ((second4 testLU).Format())
-printfn "testLU - U: \n%A" ((fourth4 testLU).Format())
-printfn "testRefLU - L: \n%A" (testRefLU.L.ToString())
-printfn "testRefLU - U: \n%A" (testRefLU.U.ToString())
+printfn "Original matrix: \n%A" (test.Format())
+
+printPrologue("LDU decomposition - Self test")
+compareDoubleTrue (Matrix.Multiply (Matrix.Multiply (second4 testLU) (third4 testLU)) (fourth4 testLU)) test doublePrecision
+
+printPrologue("LDU decomposition - Lower matrix")
+compareDoubleTrue (second4 testLU) (matrix<double>(test.rowCnt, test.columnCnt, (testRefLU.L.Storage.ToArray()))) doublePrecision
+
+printPrologue("LDU decomposition - Upper matrix")
+compareDoubleTrue (Matrix.Multiply (third4 testLU) (fourth4 testLU)) (matrix<double>(test.rowCnt, test.columnCnt, (testRefLU.U.Storage.ToArray()))) doublePrecision
 
 // End test.
 endTest()
