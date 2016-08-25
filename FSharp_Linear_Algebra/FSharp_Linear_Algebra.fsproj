@@ -55,7 +55,6 @@
     <Compile Include="Matrix.fs" />
     <Compile Include="Vector.fsi" />
     <Compile Include="Vector.fs" />
-    <None Include="Script.fsx" />
     <None Include="ReadmeScript.fsx" />
     <None Include="TestScript.fsx" />
     <Content Include="packages.config" />

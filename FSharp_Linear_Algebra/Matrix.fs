@@ -116,6 +116,15 @@ type RandomMatrix () =
         let elem = Array2D.init row col (fun _ _ -> ((int64)(rnd.Next()) <<< 32) + (int64)(rnd.Next()))
         matrix<int64>(row, col, elem)
 
+    /// <summary>Generates single(float32) matrix of given size.</summary>
+    /// <param name="row">Number of rows.</param>
+    /// <param name="col">Number of columns.</param>
+    /// <returns>Returns generated row*col size matrix.</returns>
+    member rm.RandomMatrixSingle (row : int) (col : int) : single matrix =
+        let rnd = new System.Random()
+        let elem = Array2D.init row col (fun _ _ -> (float32)(rnd.NextDouble()))
+        matrix<single>(row, col, elem)
+
     /// <summary>Generates double matrix of given size.</summary>
     /// <param name="row">Number of rows.</param>
     /// <param name="col">Number of columns.</param>
@@ -124,6 +133,16 @@ type RandomMatrix () =
         let rnd = new System.Random()
         let elem = Array2D.init row col (fun _ _ -> rnd.NextDouble())
         matrix<double>(row, col, elem)
+
+    /// <summary>Generates decimal matrix of given size.</summary>
+    /// <param name="row">Number of rows.</param>
+    /// <param name="col">Number of columns.</param>
+    /// <returns>Returns generated row*col size matrix.</returns>
+    member rm.RandomMatrixDecimal (row : int) (col : int) : decimal matrix =
+        let rnd = new System.Random((int)(System.DateTime.Now.ToBinary()))
+        let scale = (byte)(rnd.Next(29))
+        let elem = Array2D.init row col (fun _ _ -> new Decimal(rnd.Next(), rnd.Next(), rnd.Next(), (rnd.Next(0, 1) = 1), (byte)(rnd.Next(29))))
+        matrix<decimal>(row, col, elem)
 
         
 

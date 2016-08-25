@@ -1,4 +1,4 @@
-﻿namespace FSharp_Linear_Algebra
+﻿namespace FSharp_Linear_Algebra.Vector
 
 open System
 open System.Collections

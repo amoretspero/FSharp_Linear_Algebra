@@ -127,5 +127,8 @@ let matMultRef1 = matrix<double>(matMultParam1.rowCnt, matMultParam2.columnCnt, 
 printPrologue("Multiplication")
 compareDoubleTrue (Matrix.Multiply matMultParam1 matMultParam2) matMultRef1 doublePrecision
 
+//let test = MathNet.Numerics.LinearAlgebra.Matrix<decimal>.Build.Random(3, 3)
+//printfn "Decimal random matrix: \n%A" (test.ToString())
+
 // End test.
 endTest()

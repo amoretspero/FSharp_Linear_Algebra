@@ -1,6 +1,7 @@
 ﻿#load "Matrix.fs"
 #load "Vector.fs"
-open FSharp_Linear_Algebra
+open FSharp_Linear_Algebra.Matrix
+open FSharp_Linear_Algebra.Vector
 
 // Some helper functions
 let fst3 (a, _, _) = a
