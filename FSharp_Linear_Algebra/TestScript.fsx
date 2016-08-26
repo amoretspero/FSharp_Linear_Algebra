@@ -146,13 +146,13 @@ let testRefLU = testRef.LU()
 
 printfn "Original matrix: \n%A" (test.Format())
 
-printPrologue("LDU decomposition - Self test")
-compareDoubleTrue (Matrix.Multiply (Matrix.Multiply (second4 testLU) (third4 testLU)) (fourth4 testLU)) test doublePrecision
+printPrologue("LDU decomposition - Self test") // Tests if PA=LDU.
+compareDoubleTrue (Matrix.Multiply (Matrix.Multiply (second4 testLU) (third4 testLU)) (fourth4 testLU)) (Matrix.Multiply (first4 testLU) test) doublePrecision
 
-printPrologue("LDU decomposition - Lower matrix")
+printPrologue("LDU decomposition - Lower matrix") // Tests if Lower matrix L is same with MathNet reference.
 compareDoubleTrue (second4 testLU) (matrix<double>(test.rowCnt, test.columnCnt, (testRefLU.L.Storage.ToArray()))) doublePrecision
 
-printPrologue("LDU decomposition - Upper matrix")
+printPrologue("LDU decomposition - Upper matrix") // Tests if Upper matrix U is same with MathNet reference.
 compareDoubleTrue (Matrix.Multiply (third4 testLU) (fourth4 testLU)) (matrix<double>(test.rowCnt, test.columnCnt, (testRefLU.U.Storage.ToArray()))) doublePrecision
 
 // End test.
