@@ -53,9 +53,11 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Matrix.fsi" />
     <Compile Include="RandomMatrix.fsi" />
+    <Compile Include="Decomposition.fsi" />
     <Compile Include="Vector.fsi" />
     <Compile Include="Matrix.fs" />
     <Compile Include="RandomMatrix.fs" />
+    <Compile Include="Decomposition.fs" />
     <Compile Include="Vector.fs" />
     <None Include="ReadmeScript.fsx" />
     <None Include="TestScript.fsx" />

@@ -3,6 +3,15 @@
 /// <summary>Exception that indicates gauss elimination of given matrix is not possible.</summary>
 exception NoLDUDecompositionPossible
 
+/// <summary>Exception that indicates given two matrices' size does not match.</summary>
+exception SizeUnmatch of int * int * int * int
+
+/// <summary>Exception that indicates given matrix is not square.</summary>
+exception NotSquare of int * int
+
+/// <summary>Exception that file is not found.</summary>
+exception FileNotFound of string
+
 [<Class>]
 /// <summary>Class for generic matrices.</summary>
 type matrix<'T> = 
@@ -21,13 +30,13 @@ type matrix<'T> =
     //new : rowCnt:int -> columnCnt:int -> zero:'T -> 'T matrix
     
     /// <summary>Gets number of rows.</summary>
-    member rowCnt : int
+    member rowCnt : int with get
 
     /// <summary>Gets number of columns.</summary>
-    member columnCnt : int
+    member columnCnt : int with get
 
     /// <summary>Gets elements of matrix.</summary>
-    member element : 'T [, ]
+    member element : 'T [, ] with get
 
     /// <summary>Format the matrix.</summary>
     member Format : unit -> string
@@ -93,17 +102,3 @@ module Matrix =
         when 'T : (static member Zero : 'T) and
              'T : (static member One : 'T) and
              'T : comparison
-
-    /// <summary>Gauss eliminates given decimal matrix.</summary>
-    /// <param name="mat">Matrix to be eliminated.</param>
-    /// <returns>Returns eliminated result.</returns>
-    /// <exception cref="FSharp_Linear_Algebra.NoGaussEliminationPossible">Thrown when gauss elimination cannot be performed.</exception>
-    val inline LDUdecomposition : mat:matrix<'T> -> matrix<'T> * matrix<'T> * matrix<'T> * matrix<'T>
-        when 'T : comparison and 
-             'T : (static member Zero : 'T) and 
-             ('a or 'T) : (static member ( - ) : 'a * 'T -> 'T) and 
-             ('T or 'b) : (static member ( - ) : 'T * 'b -> 'T) and 
-             'T : (static member ( * ) : 'T * 'T -> 'b) and 
-             'T : (static member ( / ) : 'T * 'T -> 'T) and 
-             'T : (static member One : 'T) and 
-             'a : (static member Zero : 'a)
