@@ -139,9 +139,11 @@ module Matrix =
     /// <returns>Returns eliminated result.</returns>
     /// <exception cref="FSharp_Linear_Algebra.NoGaussEliminationPossible">Thrown when gauss elimination cannot be performed.</exception>
     val inline LDUdecomposition : mat:matrix<'T> -> matrix<'T> * matrix<'T> * matrix<'T> * matrix<'T>
-        when 'T : (static member Zero : 'T) and 
+        when 'T : comparison and 
+             'T : (static member Zero : 'T) and 
+             ('a or 'T) : (static member ( - ) : 'a * 'T -> 'T) and 
+             ('T or 'b) : (static member ( - ) : 'T * 'b -> 'T) and 
+             'T : (static member ( * ) : 'T * 'T -> 'b) and 
              'T : (static member ( / ) : 'T * 'T -> 'T) and 
-             ('T or 'a) : (static member ( - ) : 'T * 'a -> 'T) and 
-             'T : (static member ( * ) : 'T * 'T -> 'a) and 
              'T : (static member One : 'T) and 
-             'T : comparison
+             'a : (static member Zero : 'a)

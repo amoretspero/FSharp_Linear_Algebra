@@ -257,6 +257,8 @@ module Matrix =
         let snd4 (_, b, _, _) = b
         let thd4 (_, _, c, _) = c
         let fth4 (_, _, _, d) = d
+        let genericAbs (a : 'T) =
+            if a >= LanguagePrimitives.GenericZero then a else LanguagePrimitives.GenericZero - a
         do if mat.columnCnt <> mat.rowCnt then raise (NotSquare(mat.columnCnt, mat.rowCnt)) // Check if matrix is square.
         let upperMatrix = matrix<'T>(mat.rowCnt, mat.columnCnt, Array2D.copy(mat.element)) // Copies input matrix.
         let mutable cnt = 0
@@ -271,7 +273,7 @@ module Matrix =
                 let mutable pivot = upperMatrix.element.[cnt, cnt]
                 for idx1 = cnt+1 to upperMatrix.rowCnt-1 do // Find largest pivot available.
                     printfn "Now finding largest pivot... idx1=%d" idx1
-                    if pivot < upperMatrix.element.[idx1, cnt] && upperMatrix.element.[idx1, cnt] <> LanguagePrimitives.GenericZero then 
+                    if genericAbs(pivot) < genericAbs(upperMatrix.element.[idx1, cnt]) && upperMatrix.element.[idx1, cnt] <> LanguagePrimitives.GenericZero then 
                         pivotLocation <- idx1
                         pivot <- upperMatrix.element.[idx1, cnt]
                 if pivotLocation <> cnt then // When largest pivot is not default one, change row.
