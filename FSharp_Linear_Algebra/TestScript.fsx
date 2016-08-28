@@ -1,4 +1,5 @@
 ﻿#load "Matrix.fs"
+#load "RandomMatrix.fs"
 #load "Vector.fs"
 #r ".\\bin\\Debug\\MathNet.Numerics.dll"
 
