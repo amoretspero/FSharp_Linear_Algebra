@@ -6,9 +6,6 @@ open System.Collections.Generic
 open System.Linq
 open System.Numerics
 
-/// <summary>Exception that indicates gauss elimination of given matrix is not possible.</summary>
-exception NoLDUDecompositionPossible
-
 /// <summary>Exception that indicates given two matrices' size does not match.</summary>
 exception SizeUnmatch of int * int * int * int
 

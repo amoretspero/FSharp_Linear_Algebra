@@ -7,6 +7,9 @@ open System.Linq
 open System.Numerics
 open FSharp_Linear_Algebra.Matrix
 
+/// <summary>Exception that indicates gauss elimination of given matrix is not possible.</summary>
+exception NoLDUDecompositionPossible
+
 /// <summary>Class for representing LDU-decomposition result.</summary>
 [<Class>]
 type LDUResult<'T> (P : 'T matrix, L : 'T matrix, D : 'T matrix, U : 'T matrix) =
@@ -43,12 +46,14 @@ type LDUResult<'T> (P : 'T matrix, L : 'T matrix, D : 'T matrix, U : 'T matrix) 
     member LDU.Upper
         with get() = _upper
 
+
+/// <summary>Module containing various decompositions.</summary>
 module Decomposition =
     
     /// <summary>LDU-decompose given matrix.</summary>
     /// <param name="mat">Matrix to be decomposed.</param>
     /// <returns>Returns decomposed result. For decomposition of PA=LDU, return value is (P * L * D * U), four-tuple.</returns>
-    /// <exception cref="FSharp_Linear_Algebra.Matrix.NoLDUDecompositionPossible">Thrown whenLDU decomposition cannot be performed.</exception>
+    /// <exception cref="FSharp_Linear_Algebra.Matrix.Decomposition.NoLDUDecompositionPossible">Thrown whenLDU decomposition cannot be performed.</exception>
     let inline LDUdecomposition (mat : 'T matrix) : 'T LDUResult =
         let fst3 (a, _, _) = a
         let snd3 (_, b, _) = b

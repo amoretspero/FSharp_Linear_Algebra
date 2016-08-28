@@ -2,6 +2,9 @@
 
 open FSharp_Linear_Algebra.Matrix
 
+/// <summary>Exception that indicates gauss elimination of given matrix is not possible.</summary>
+exception NoLDUDecompositionPossible
+
 /// <summary>Class for representing LDU-decomposition result.</summary>
 [<Class>]
 type LDUResult<'T> =
@@ -22,6 +25,7 @@ type LDUResult<'T> =
     /// <summary>Gets upper matrix of LDU-decomposition.</summary>
     member Upper : 'T matrix with get
 
+/// <summary>Module containing various decompositions.</summary>
 module Decomposition =
 
     /// <summary>Gauss eliminates given decimal matrix.</summary>

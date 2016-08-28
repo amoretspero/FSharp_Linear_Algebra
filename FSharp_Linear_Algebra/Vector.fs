@@ -92,7 +92,7 @@ module Vector =
 
     /// <summary>Creates and returns zero vector of given dimension.</summary>
     /// <param name="size">Size of zero vector to create.</param>
-    let ZeroVector (dim : int) : 'T vector =
+    let ZeroVector<'T> (dim : int) : 'T vector =
         vector(Array.zeroCreate dim)
 
     /// <summary>Creates and returns unit vector of given dimension, having one of type 'T at location.
