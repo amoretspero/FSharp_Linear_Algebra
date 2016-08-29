@@ -1,10 +1,12 @@
 ﻿#load "Matrix.fs"
 #load "RandomMatrix.fs"
 #load "Decomposition.fs"
+#load "MatrixComputation.fs"
 #load "Vector.fs"
 #r ".\\bin\\Debug\\MathNet.Numerics.dll"
 
 open FSharp_Linear_Algebra.Matrix
+open FSharp_Linear_Algebra.Matrix.Computation
 open FSharp_Linear_Algebra.Matrix.Decomposition
 open MathNet.Numerics
 
