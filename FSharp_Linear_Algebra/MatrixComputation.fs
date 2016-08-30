@@ -25,9 +25,12 @@ module Matrix =
 
             // Compute inverse of L.
             for i=0 to lower.columnCnt do
+                let rowTemp = lower.element.[i, *] // Temporarily get row for locality.
                 for j=i to 0 do
-                    lowerInverse.element.[i, j] <- LanguagePrimitives.GenericOne<'T> / lower.element.[i, j]
-                    // TODO
+                    let columnTemp = lower.element.[*, j] // Temporarily get column for locality.
+                    let mutable accum = LanguagePrimitives.GenericZero<'T> 
+                    for k=0 to i-1 do accum <- accum + rowTemp.[k] * columnTemp.[k] // Accumulate known values of row-column multiplication.
+                    lowerInverse.element.[i, j] <- (lowerInverse.element.[i, j] - accum) / rowTemp.[j] // Compute [i, j] of lowerInverse.
 
             // Gets the upper matrix.
             let upper = LDUResult.Upper
