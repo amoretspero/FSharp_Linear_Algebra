@@ -1,6 +1,9 @@
 # FSharp Linear Algebra  
 Library for linear algebra made with F#.  
   
+## Build Status  
+[![Build status](https://ci.appveyor.com/api/projects/status/bix99yky01g32mia?svg=true)](https://ci.appveyor.com/project/amoretspero/fsharp-linear-algebra)
+  
 ## Version  
 **Stable** : **0.4.0.0**  
 **Unstable** : **N/A** (stable version = newest version)     
