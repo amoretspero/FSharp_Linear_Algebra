@@ -15,6 +15,9 @@ exception NotSquare of int * int
 /// <summary>Exception that file is not found.</summary>
 exception FileNotFound of string
 
+/// <summary>Exception that given matrix does not have inverse.</summary>
+exception NotInvertible
+
 /// <summary>Class for generic matrices.</summary>
 [<Class>]
 type matrix<'T>(rowCnt : int, columnCnt : int, element : 'T [,]) =

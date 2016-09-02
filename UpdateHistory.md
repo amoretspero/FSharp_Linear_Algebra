@@ -1,5 +1,11 @@
 ## Update History  
-
+  
+### 0.3.2.0 -> 0.4.0.0  
+  
+- LDU decomposition is supported for generic types.  
+- Testing scripts for matrix is available. Tests addition, subtraction, multiplication and LDU decomposition.  
+- Testing scripts uses MathNet linear algebra library for testing.    
+  
 ### 0.3.1.0 -> 0.3.2.0  
   
 - For matrices, read from file(<code>int32</code>, <code>double</code> types only.) and write to file(all types) are supported.  
