@@ -2,16 +2,15 @@
 Library for linear algebra made with F#.  
   
 ## Version  
-**Stable** : **0.4.0.0**  
+**Stable** : **0.4.1.0**  
 **Unstable** : **N/A** (stable version = newest version)     
   
 ## Update History  
   
-### 0.3.2.0 -> 0.4.0.0  
+### 0.4.0.0 -> 0.4.1.0  
   
-- LDU decomposition is supported for generic types.  
-- Testing scripts for matrix is available. Tests addition, subtraction, multiplication and LDU decomposition.  
-- Testing scripts uses MathNet linear algebra library for testing.  
+- Finding inverse matrix is now available.  
+- Inverse matrix computation is based on LDU decomposition and backward/forward substitution.  
   
 ## Description  
 This project is to provide F#-made linear algebra library.  
@@ -91,9 +90,11 @@ let doubleMatrixFromFile = Matrix.ReadFromFileDouble ".\DoubleMatrix.txt"
 4) Transpose - <code>Matrix.Transpose()</code>  
 5) Scalar multiplication - <code>Matrix.ScalarMultiply()</code>  
 6) Identity matrix - <code>Matrix.Identity()</code>  
+7) Inverse matrix - <code>Matrix.Inverse()</code>
 
 ```fsharp
 open FSharp_Linear_Algebra.Matrix
+open FSharp_Linear_Algebra.Matrix.Computation
 
 // Matrix initialization.
 let matrix6 = matrix<decimal>([| [| 2M; 1M; 1M; |]; [| 4M; -6M; 0M; |]; [| -2M; 7M; 2M; |] |])
@@ -122,6 +123,10 @@ matrixScalarMultiply.Format() |> printfn "matrixScalarMultiply: \n%s"
 // Identity matrix
 let matrixIdentity = Matrix.Identity 3 1.0
 matrixIdentity.Format() |> printfn "matrixIdentity: \n%s"
+
+// Inverse matrix
+let matrixInverse = Matrix.Inverse matrix6
+matrixInverse.Format() |> printfn "matrixInverse: \n%s
 
 (*
 Output: 
@@ -155,6 +160,11 @@ matrixIdentity:
 1	0	0	
 0	1	0	
 0	0	1	
+
+matrixInverse: 
+0.750000	-0.312500	-0.375000	
+0.50000	-0.37500	-0.25000	
+-1.000	1.000	1.000	
 
 *)
 ```  

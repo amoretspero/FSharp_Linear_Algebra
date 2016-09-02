@@ -143,7 +143,7 @@ compareDoubleTrue (Matrix.Multiply matMultParam1 matMultParam2) matMultRef1 doub
 
 // LDU decomposition test.
 
-let test = RandomMatrix().RandomMatrixDouble 5 5
+let test = RandomMatrix().RandomMatrixDouble 16 16
 let testRef = MathNet.Numerics.LinearAlgebra.Matrix.Build.DenseOfArray(test.element)
 
 let testLU = Decomposition.LDUdecomposition test
@@ -159,6 +159,20 @@ compareDoubleTrue testLU.Lower (matrix<double>(test.rowCnt, test.columnCnt, (tes
 
 printPrologue("LDU decomposition - Upper matrix") // Tests if Upper matrix U is same with MathNet reference.
 compareDoubleTrue (Matrix.Multiply testLU.Diagonal testLU.Upper) (matrix<double>(test.rowCnt, test.columnCnt, (testRefLU.U.Storage.ToArray()))) doublePrecision
+
+// Inverse matrix test.
+
+let inverseTest = RandomMatrix().RandomMatrixDouble 16 16
+let inverseTestRef = MathNet.Numerics.LinearAlgebra.Matrix.Build.DenseOfArray(inverseTest.element)
+
+let inverseTestRes = Matrix.Inverse inverseTest
+let inverseTestRefRes = inverseTestRef.Inverse()
+
+printPrologue("Inverse matrix - Self test") // Tests if A * A^(-1) = I
+compareDoubleTrue (Matrix.Multiply inverseTest inverseTestRes) (Matrix.Identity inverseTest.rowCnt 1.0) doublePrecision
+
+printPrologue("Inverse matrix - Referenct test") // Tests if Inverse matrix is same with MathNet reference.
+compareDoubleTrue (matrix<double>(inverseTest.rowCnt, inverseTest.columnCnt, inverseTestRefRes.Storage.ToArray())) inverseTestRes doublePrecision
 
 // End test.
 endTest()

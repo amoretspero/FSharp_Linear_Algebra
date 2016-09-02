@@ -1,9 +1,11 @@
 ﻿#load "Matrix.fs"
 #load "RandomMatrix.fs"
 #load "Decomposition.fs"
+#load "MatrixComputation.fs"
 #load "Vector.fs"
 open FSharp_Linear_Algebra.Matrix
 open FSharp_Linear_Algebra.Matrix.Decomposition
+open FSharp_Linear_Algebra.Matrix.Computation
 open FSharp_Linear_Algebra.Vector
 
 // Matrix - construction
@@ -80,6 +82,10 @@ matrixScalarMultiply.Format() |> printfn "matrixScalarMultiply: \n%s"
 // Identity matrix
 let matrixIdentity = Matrix.Identity 3 1.0
 matrixIdentity.Format() |> printfn "matrixIdentity: \n%s"
+
+// Inverse matrix
+let matrixInverse = Matrix.Inverse matrix6
+matrixInverse.Format() |> printfn "matrixInverse: \n%s"
 
 // Matrix - decomposition
 
