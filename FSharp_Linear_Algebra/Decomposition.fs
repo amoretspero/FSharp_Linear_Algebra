@@ -46,6 +46,50 @@ type LDUResult<'T> (P : 'T matrix, L : 'T matrix, D : 'T matrix, U : 'T matrix) 
     member LDU.Upper
         with get() = _upper
 
+/// <summary>Class for representing RREF(Row-Reduced Echelon Form)-decomposition result.</summary>
+[<Class>]
+type RREFResult<'T> (P : 'T matrix, L : 'T matrix, D : 'T matrix, U : 'T matrix, R : 'T matrix) =
+    
+    // Private data -------------------------------------------------
+
+    /// <summary>Permutation matrix of RREF-decomposition.</summary>
+    let _permutation = P
+    
+    /// <summary>Lower triangular matrix of RREF-decomposition.</summary>
+    let _lower = L
+
+    /// <summary>Diagonal matrix of RREF-decomposition.</summary>
+    let _diagonal = D
+
+    /// <summary>Upper triangular matrix of RREF-decomposition.</summary>
+    let _upper = U
+
+    /// <summary>Row-Reduced Echelon Form matrix of RREF-decomposition.</summary>
+    let _rref = R
+
+    // Instance properties ------------------------------------------
+
+    /// <summary>Gets permutation matrix of RREF-decomposition.</summary>
+    member RREF.Permutation
+        with get() = _permutation
+    
+    /// <summary>Gets lower triangular matrix of RREF-decomposition.</summary>
+    member RREF.Lower
+        with get() = _lower
+
+    /// <summary>Gets diagonal matrix of RREF-decomposition.</summary>
+    member RREF.Diagonal
+        with get() = _diagonal
+
+    /// <summary>Gets upper triangular matrix of RREF-decomposition.</summary>
+    member RREF.Upper
+        with get() = _upper
+
+    /// <summary>Gets Row-Reduced Echelon Form matrix of RREF-decomposition.</summary>
+    member RREF.RREF
+        with get() = _rref
+    
+
 
 /// <summary>Module containing various decompositions.</summary>
 module Decomposition =

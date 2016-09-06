@@ -25,6 +25,30 @@ type LDUResult<'T> =
     /// <summary>Gets upper matrix of LDU-decomposition.</summary>
     member Upper : 'T matrix with get
 
+/// <summary>Class for representing RREF(Row-Reduced Echelon Form)-decomposition result.</summary>
+[<Class>]
+type RREFResult<'T> =
+    
+    /// <summary>Default constructor.
+    /// P is permutation matrix, L is lower triangular matrix, D is diagonal matrix, U is upper triangular matrix and
+    /// R is RREF matrix.</summary>
+    new : P : 'T matrix * L : 'T matrix * D : 'T matrix * U : 'T matrix * R : 'T matrix -> 'T RREFResult
+
+    /// <summary>Gets permutation matrix of RREF-decomposition.</summary>
+    member Permutation : 'T matrix with get
+
+    /// <summary>Gets lower triangular matrix of RREF-decomposition.</summary>
+    member Lower : 'T matrix with get
+
+    /// <summary>Gets diagonal matrix of RREF-decomposition.</summary>
+    member Diagonal : 'T matrix with get
+
+    /// <summary>Gets upper triangular matrix of RREF-decomposition.</summary>
+    member Upper : 'T matrix with get
+
+    /// <summary>Gets Row-Reduced Echelon Form matrix of RREF-decomposition.</summary>
+    member RREF : 'T matrix with get
+
 /// <summary>Module containing various decompositions.</summary>
 module Decomposition =
 
