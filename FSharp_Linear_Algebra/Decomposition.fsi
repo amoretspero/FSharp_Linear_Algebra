@@ -52,10 +52,10 @@ type RREFResult<'T> =
 /// <summary>Module containing various decompositions.</summary>
 module Decomposition =
 
-    /// <summary>Gauss eliminates given decimal matrix.</summary>
-    /// <param name="mat">Matrix to be eliminated.</param>
-    /// <returns>Returns eliminated result.</returns>
-    /// <exception cref="FSharp_Linear_Algebra.Matrix.NoLDUDecompositionPossible">Thrown when gauss elimination cannot be performed.</exception>
+    /// <summary>LDU-decompose given matrix.</summary>
+    /// <param name="mat">Matrix to be decomposed.</param>
+    /// <returns>Returns decomposed result.</returns>
+    /// <exception cref="FSharp_Linear_Algebra.Matrix.Decomposition.NoLDUDecompositionPossible">Thrown when LDU decomposition cannot be performed.</exception>
     val inline LDUdecomposition : mat:matrix<'T> -> LDUResult<'T>
         when 'T : comparison and 
              'T : (static member Zero : 'T) and 
@@ -65,4 +65,16 @@ module Decomposition =
              'T : (static member ( / ) : 'T * 'T -> 'T) and 
              'T : (static member One : 'T) and 
              'a : (static member Zero : 'a)
-             
+
+    /// <summary>Gets Row-reduced Echelon Form of given matrix and decompose.</summary>
+    /// <param name="mat">Matrix to be eliminated and decomposed.</param>
+    /// <returns>Returns decomposition result.</returns>
+    val inline RREFdecomposition : mat:matrix<'T> -> RREFResult<'T>
+        when 'T : comparison and 
+             'T : (static member Zero : 'T) and 
+             ('a or 'T) : (static member ( - ) : 'a * 'T -> 'T) and 
+             'T : (static member ( / ) : 'T * 'T -> 'T) and 
+             ('T or 'b) : (static member ( - ) : 'T * 'b -> 'T) and 
+             'T : (static member ( * ) : 'T * 'T -> 'b) and 
+             'T : (static member One : 'T) and 
+             'a : (static member Zero : 'a)
