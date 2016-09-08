@@ -70,7 +70,7 @@ let compareDoubleTrue (res : double matrix) (expected : double matrix) (threshol
         for i=0 to res.rowCnt - 1 do
             for j=0 to res.columnCnt - 1 do
                 if (System.Math.Abs(res.element.[i, j] - expected.element.[i, j]) > threshold) then 
-                    printfn "Diff >> Element[%d, %d]: Expected %A, Got %A" i j res.element.[i, j] expected.element.[i, j]
+                    printfn "Diff >> Element[%d, %d]: Expected %A, Got %A" i j expected.element.[i, j] res.element.[i, j]
         total <- total + 1
         failed <- failed + 1
         false
@@ -173,6 +173,32 @@ compareDoubleTrue (Matrix.Multiply inverseTest inverseTestRes) (Matrix.Identity 
 
 printPrologue("Inverse matrix - Referenct test") // Tests if Inverse matrix is same with MathNet reference.
 compareDoubleTrue (matrix<double>(inverseTest.rowCnt, inverseTest.columnCnt, inverseTestRefRes.Storage.ToArray())) inverseTestRes doublePrecision
+
+// Row-Reduced Echelon Form test.
+
+let rrefTest1 = matrix<double>([| [| 1.0; 3.0; 3.0; 2.0 |]; [| 2.0; 6.0; 9.0; 7.0 |]; [| -1.0; -3.0; 3.0; 4.0 |] |])
+let rrefTest2 = matrix<double>([| [| 1.0; 2.0; 3.0; 5.0 |]; [| 2.0; 4.0; 8.0; 12.0 |]; [| 3.0; 6.0; 7.0; 13.0 |] |])
+let rrefTest3 = RandomMatrix().RandomMatrixDouble 16 12
+
+let rrefTestRes1 = Decomposition.RREFdecomposition rrefTest1
+let rrefTestRes2 = Decomposition.RREFdecomposition rrefTest2
+let rrefTestRes3 = Decomposition.RREFdecomposition rrefTest3
+
+printPrologue("Row-Reduced Echelon Form - Test from book 1")
+compareDoubleTrue rrefTestRes1.RREF (matrix<double>([| [| 1.0; 3.0; 0.0; -1.0; |]; [| 0.0; 0.0; 1.0; 1.0; |]; [| 0.0; 0.0; 0.0; 0.0 |] |])) doublePrecision
+
+printPrologue("Row-Reduced Echelon Form - Test from book 2")
+compareDoubleTrue rrefTestRes2.RREF (matrix<double>([| [| 1.0; 2.0; 0.0; 2.0 |]; [| 0.0; 0.0; 1.0; 1.0 |]; [| 0.0; 0.0; 0.0; 0.0 |] |])) doublePrecision
+
+printPrologue("Row-Reduced Echelon Form - Self test")
+(*rrefTestRes3.Lower.Format() |> printfn "Lower matrix - \n%A"
+rrefTestRes3.Diagonal.Format() |> printfn "Diagonal matrix - \n%A"
+rrefTestRes3.Upper.Format() |> printfn "Upper matrix - \n%A"
+rrefTestRes3.RREF.Format() |> printfn "RREF matrix - \n%A"
+(Matrix.Multiply rrefTestRes3.Upper rrefTestRes3.RREF).Format() |> printfn "UR - \n%A"
+(Matrix.Multiply (Matrix.Multiply rrefTestRes3.Diagonal rrefTestRes3.Upper) rrefTestRes3.RREF).Format() |> printfn "DUR - \n%A"
+(Matrix.Multiply (Matrix.Multiply (Matrix.Multiply rrefTestRes3.Lower rrefTestRes3.Diagonal) rrefTestRes3.Upper) rrefTestRes3.RREF).Format() |> printfn "LDUR - \n%A"*)
+compareDoubleTrue (Matrix.Multiply (Matrix.Multiply (Matrix.Multiply rrefTestRes3.Lower rrefTestRes3.Diagonal) rrefTestRes3.Upper) rrefTestRes3.RREF) (Matrix.Multiply rrefTestRes3.Permutation rrefTest3) doublePrecision
 
 // End test.
 endTest()

@@ -219,7 +219,7 @@ module Decomposition =
         let fth4 (_, _, _, d) = d
         let genericAbs (a : 'T) =
             if a >= LanguagePrimitives.GenericZero then a else LanguagePrimitives.GenericZero - a
-        let rrefRes = matrix<'T>(mat.rowCnt, mat.columnCnt, mat.element) // Copies input matrix
+        let rrefRes = matrix<'T>(mat.rowCnt, mat.columnCnt, Array2D.copy(mat.element)) // Copies input matrix
 
         // Keeps information of row-subtraction ratios and its location between permutations. 
         // This will be used to construct lower triangular matrix L.
@@ -252,7 +252,7 @@ module Decomposition =
                 let mutable pivotLocation = rowCnt
                 let mutable pivot = rrefRes.element.[rowCnt, columnCnt]
                 Array.iteri (fun idx elem -> 
-                    if (genericAbs pivot) < (genericAbs elem) then 
+                    if (genericAbs pivot) < (genericAbs elem) && idx > rowCnt then 
                         pivotLocation <- idx
                         pivot <- elem) rrefRes.element.[*, columnCnt]
                 // If row-exchange is needed, change.
@@ -280,7 +280,7 @@ module Decomposition =
                 let mutable pivotLocation = rowCnt
                 let mutable pivot = rrefRes.element.[rowCnt, columnCnt]
                 Array.iteri (fun idx elem ->
-                    if (genericAbs pivot) < (genericAbs elem) then
+                    if (genericAbs pivot) < (genericAbs elem) && idx > rowCnt then
                         pivotLocation <- idx
                         pivot <- elem) rrefRes.element.[*, columnCnt]
                 if (pivotLocation <> rowCnt) then // When cured successfully.
@@ -309,7 +309,7 @@ module Decomposition =
             let pivotValue = thd3 pivot
             // Subtract from each row above pivot.
             for i=pivotRow-1 downto 0 do
-                let upperRatio = rrefRes.element.[i, pivotColumn] / pivotValue // Gets subtraction ratio.
+                let upperRatio = rrefRes.element.[i, pivotColumn] / rrefRes.element.[pivotRow, pivotColumn] // Gets subtraction ratio.
                 upperRatios.Value <- Array.append upperRatios.Value [| (pivotRow, i, upperRatio) |]
                 // Subtract from current row.
                 for j=pivotColumn to mat.columnCnt-1 do
