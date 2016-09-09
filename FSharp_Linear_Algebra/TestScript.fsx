@@ -1,10 +1,12 @@
 ﻿#load "Matrix.fs"
+#load "Vector.fs"
 #load "RandomMatrix.fs"
 #load "Decomposition.fs"
 #load "MatrixComputation.fs"
 #load "Vector.fs"
 #r ".\\bin\\Debug\\MathNet.Numerics.dll"
 
+open FSharp_Linear_Algebra.Vector
 open FSharp_Linear_Algebra.Matrix
 open FSharp_Linear_Algebra.Matrix.Computation
 open FSharp_Linear_Algebra.Matrix.Decomposition
@@ -48,6 +50,23 @@ let compareTrue (res : 'T matrix) (expected : 'T matrix) =
         for i=0 to res.rowCnt - 1 do
             for j=0 to res.columnCnt - 1 do
                 if res.element.[i, j] <> expected.element.[i, j] then printfn "Diff >> Element[%d, %d]: Expected %A, Got %A" i j res.element.[i, j] expected.element.[i, j]
+        total <- total + 1
+        failed <- failed + 1
+        false
+
+let compareSpaceTrue (res : vector<'T> []) (expected : vector<'T> []) =
+    if res = expected then
+        printfn "Test #%d success." (total+1)
+        total <- total + 1
+        passed <- passed + 1
+        true
+    else
+        printfn "Test #%d failed." (total+1)
+        printfn "Expected: \n%s" (String.concat System.Environment.NewLine (Array.map (fun (x : 'T vector) -> x.Format()) res))
+        printfn "Got: \n%s" (String.concat System.Environment.NewLine (Array.map (fun (x : 'T vector) -> x.Format()) expected))
+        for i=0 to res.Length-1 do
+            for j=0 to res.[i].dim-1 do
+                if expected.[i].element.[j] <> res.[i].element.[j] then printfn "Diff >> vector #%d [%d]: Expected %A, got %A" i j expected.[i].element.[j] res.[i].element.[j]
         total <- total + 1
         failed <- failed + 1
         false
@@ -199,6 +218,23 @@ rrefTestRes3.RREF.Format() |> printfn "RREF matrix - \n%A"
 (Matrix.Multiply (Matrix.Multiply rrefTestRes3.Diagonal rrefTestRes3.Upper) rrefTestRes3.RREF).Format() |> printfn "DUR - \n%A"
 (Matrix.Multiply (Matrix.Multiply (Matrix.Multiply rrefTestRes3.Lower rrefTestRes3.Diagonal) rrefTestRes3.Upper) rrefTestRes3.RREF).Format() |> printfn "LDUR - \n%A"*)
 compareDoubleTrue (Matrix.Multiply (Matrix.Multiply (Matrix.Multiply rrefTestRes3.Lower rrefTestRes3.Diagonal) rrefTestRes3.Upper) rrefTestRes3.RREF) (Matrix.Multiply rrefTestRes3.Permutation rrefTest3) doublePrecision
+
+// Column space test.
+
+let columnSpaceTest1 = matrix<double>([| [| 1.0; 3.0; 3.0; 2.0 |]; [| 2.0; 6.0; 9.0; 7.0 |]; [| -1.0; -3.0; 3.0; 4.0 |] |])
+let columnSpaceTest2 = matrix<double>([| [| 1.0; 2.0; 3.0; 5.0 |]; [| 2.0; 4.0; 8.0; 12.0 |]; [| 3.0; 6.0; 7.0; 13.0 |] |])
+
+let columnSpaceTestRes1 = Matrix.ColumnSpace columnSpaceTest1
+let columnSpaceTestRes2 = Matrix.ColumnSpace columnSpaceTest2
+
+let columnSpaceTestResMat1 = matrix<double>(columnSpaceTestRes1.Length, columnSpaceTestRes1.[0].dim, (Array2D.init columnSpaceTestRes1.Length columnSpaceTestRes1.[0].dim (fun idx0 idx1 -> columnSpaceTestRes1.[idx0].element.[idx1])))
+let columnSpaceTestResMat2 = matrix<double>(columnSpaceTestRes2.Length, columnSpaceTestRes2.[0].dim, (Array2D.init columnSpaceTestRes2.Length columnSpaceTestRes2.[0].dim (fun idx0 idx1 -> columnSpaceTestRes2.[idx0].element.[idx1])))
+
+let columnSpaceTestRef1 = matrix<double>([| [| 1.0; 2.0; -1.0 |]; [| 3.0; 9.0; 3.0 |] |])
+let columnSpaceTestRef2 = matrix<double>([| [| 1.0; 2.0; 3.0 |]; [| 3.0; 8.0; 7.0 |] |])
+
+compareTrue columnSpaceTestResMat1 columnSpaceTestRef1
+compareTrue columnSpaceTestResMat2 columnSpaceTestRef2
 
 // End test.
 endTest()
