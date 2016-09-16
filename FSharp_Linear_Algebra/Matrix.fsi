@@ -27,7 +27,11 @@ type matrix<'T> =
     /// <param name="rowCnt">Number of rows</param>
     /// <param name="columnCnt">Number of columns</param>
     /// <param name="zero">Represents zero for type to use.</param>
-    //new : rowCnt:int -> columnCnt:int -> zero:'T -> 'T matrix
+    new : rowCnt:int -> columnCnt:int -> zero:'T -> 'T matrix
+
+    /// <summary>Generates matrix with given array of array of elements.</summary>
+    /// <param name="elem">Array of array of 'T elements.</param>
+    new : elem : 'T [] [] -> 'T matrix
     
     /// <summary>Gets number of rows.</summary>
     member rowCnt : int with get

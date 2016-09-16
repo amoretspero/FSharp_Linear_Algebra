@@ -51,11 +51,11 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Matrix.fsi" />
-    <Compile Include="Vector.fsi" />
-    <Compile Include="RandomMatrix.fsi" />
-    <Compile Include="Decomposition.fsi" />
-    <Compile Include="MatrixComputation.fsi" />
+    <None Include="Matrix.fsi" />
+    <None Include="Vector.fsi" />
+    <None Include="RandomMatrix.fsi" />
+    <None Include="Decomposition.fsi" />
+    <None Include="MatrixComputation.fsi" />
     <Compile Include="Matrix.fs" />
     <Compile Include="Vector.fs" />
     <Compile Include="RandomMatrix.fs" />
