@@ -168,8 +168,6 @@ let testRef = MathNet.Numerics.LinearAlgebra.Matrix.Build.DenseOfArray(test.elem
 let testLU = Decomposition.LDUdecomposition test
 let testRefLU = testRef.LU()
 
-printfn "Original matrix: \n%A" (test.Format())
-
 printPrologue("LDU decomposition - Self test") // Tests if PA=LDU.
 compareDoubleTrue (Matrix.Multiply (Matrix.Multiply testLU.Lower testLU.Diagonal) testLU.Upper) (Matrix.Multiply testLU.Permutation test) doublePrecision
 
@@ -227,14 +225,37 @@ let columnSpaceTest2 = matrix<double>([| [| 1.0; 2.0; 3.0; 5.0 |]; [| 2.0; 4.0; 
 let columnSpaceTestRes1 = Matrix.ColumnSpace columnSpaceTest1
 let columnSpaceTestRes2 = Matrix.ColumnSpace columnSpaceTest2
 
-let columnSpaceTestResMat1 = matrix<double>(columnSpaceTestRes1.Length, columnSpaceTestRes1.[0].dim, (Array2D.init columnSpaceTestRes1.Length columnSpaceTestRes1.[0].dim (fun idx0 idx1 -> columnSpaceTestRes1.[idx0].element.[idx1])))
-let columnSpaceTestResMat2 = matrix<double>(columnSpaceTestRes2.Length, columnSpaceTestRes2.[0].dim, (Array2D.init columnSpaceTestRes2.Length columnSpaceTestRes2.[0].dim (fun idx0 idx1 -> columnSpaceTestRes2.[idx0].element.[idx1])))
+let columnSpaceTestResMat1 = matrix<double>(columnSpaceTestRes1.[0].dim, columnSpaceTestRes1.Length, (Array2D.init columnSpaceTestRes1.[0].dim columnSpaceTestRes1.Length (fun idx0 idx1 -> columnSpaceTestRes1.[idx1].element.[idx0])))
+let columnSpaceTestResMat2 = matrix<double>(columnSpaceTestRes2.[0].dim, columnSpaceTestRes2.Length, (Array2D.init columnSpaceTestRes2.[0].dim columnSpaceTestRes2.Length (fun idx0 idx1 -> columnSpaceTestRes2.[idx1].element.[idx0])))
 
-let columnSpaceTestRef1 = matrix<double>([| [| 1.0; 2.0; -1.0 |]; [| 3.0; 9.0; 3.0 |] |])
-let columnSpaceTestRef2 = matrix<double>([| [| 1.0; 2.0; 3.0 |]; [| 3.0; 8.0; 7.0 |] |])
+let columnSpaceTestRef1 = matrix<double>([| [| 1.0; 3.0 |]; [| 2.0; 9.0 |]; [| -1.0; 3.0 |] |])
+let columnSpaceTestRef2 = matrix<double>([| [| 1.0; 3.0 |]; [| 2.0; 8.0 |]; [| 3.0; 7.0 |] |])
 
+printPrologue("Column-Space - Test from book 1")
 compareTrue columnSpaceTestResMat1 columnSpaceTestRef1
+
+printPrologue("Column-Space - Test from book 2")
 compareTrue columnSpaceTestResMat2 columnSpaceTestRef2
+
+// Null space test.
+
+let nullSpaceTest1 = matrix<double>([| [| 1.0; 3.0; 3.0; 2.0 |]; [| 2.0; 6.0; 9.0; 7.0 |]; [| -1.0; -3.0; 3.0; 4.0 |] |])
+let nullSpaceTest2 = matrix<double>([| [| 1.0; 2.0; 3.0; 5.0 |]; [| 2.0; 4.0; 8.0; 12.0 |]; [| 3.0; 6.0; 7.0; 13.0 |] |])
+
+let nullSpaceTestRes1 = Matrix.NullSpace nullSpaceTest1
+let nullSpaceTestRes2 = Matrix.NullSpace nullSpaceTest2
+
+let nullSpaceTestResMat1 = matrix<double>(nullSpaceTestRes1.[0].dim, nullSpaceTestRes1.Length, (Array2D.init nullSpaceTestRes1.[0].dim nullSpaceTestRes1.Length (fun idx0 idx1 -> nullSpaceTestRes1.[idx1].element.[idx0])))
+let nullSpaceTestResMat2 = matrix<double>(nullSpaceTestRes2.[0].dim, nullSpaceTestRes2.Length, (Array2D.init nullSpaceTestRes2.[0].dim nullSpaceTestRes2.Length (fun idx0 idx1 -> nullSpaceTestRes2.[idx1].element.[idx0])))
+
+let nullSpaceTestRef1 = matrix<double>([| [| -3.0; 1.0 |]; [| 1.0; 0.0 |]; [| 0.0; -1.0 |]; [| 0.0; 1.0 |] |])
+let nullSpaceTestRef2 = matrix<double>([| [| -2.0; -2.0 |]; [| 1.0; 0.0 |]; [| 0.0; -1.0 |]; [| 0.0; 1.0 |] |])
+
+printPrologue("Null-Space - Test from book 1")
+compareDoubleTrue nullSpaceTestResMat1 nullSpaceTestRef1 doublePrecision
+
+printPrologue("Null-Space - Test from book 2")
+compareDoubleTrue nullSpaceTestResMat2 nullSpaceTestRef2 doublePrecision
 
 // End test.
 endTest()

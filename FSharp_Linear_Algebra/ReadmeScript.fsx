@@ -1,8 +1,9 @@
 ﻿#load "Matrix.fs"
 #load "RandomMatrix.fs"
+#load "Vector.fs"
 #load "Decomposition.fs"
 #load "MatrixComputation.fs"
-#load "Vector.fs"
+
 open FSharp_Linear_Algebra.Matrix
 open FSharp_Linear_Algebra.Matrix.Decomposition
 open FSharp_Linear_Algebra.Matrix.Computation
