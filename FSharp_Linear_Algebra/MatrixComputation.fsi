@@ -46,3 +46,9 @@ module Matrix =
              'T : (static member One : 'T) and 
              'T : (static member ( - ) : 'T * 'T -> 'T) and 
              'a : (static member Zero : 'a)
+
+    /// <summary>Solves system of linear equations, Ax=b. Solution dose not include null-space solutions.</summary>
+    /// <param name="mat">Matrix of coefficients, A.</param>
+    /// <param name="rhs">Right-hand side of equation, b.</param>
+    /// <returns>Particular solution to Ax=b as vector.</returns>
+    val inline Solve : mat : 'T matrix -> rhs : 'T vector -> 'T vector

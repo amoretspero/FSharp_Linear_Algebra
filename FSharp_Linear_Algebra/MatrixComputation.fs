@@ -141,3 +141,47 @@ module Matrix =
             resArray.Value <- Array.append resArray.Value [| vector<'T>(resMatrix.element.[*, i]) |]
 
         resArray.Value
+
+    /// <summary>Solves system of linear equations, Ax=b. Solution dose not include null-space solutions.</summary>
+    /// <param name="mat">Matrix of coefficients, A.</param>
+    /// <param name="rhs">Right-hand side of equation, b.</param>
+    /// <returns>Particular solution to Ax=b as vector.</returns>
+    let inline Solve (mat : 'T matrix) (rhs : 'T vector) : 'T vector =
+        // Decompose given matrix to RREF.
+        let rrefResult = Decomposition.RREFdecomposition mat
+        let rrefResultRREF = rrefResult.RREF
+        let rrefResultPermutation = rrefResult.Permutation
+
+        // Convert vector RHS to matrix form.
+        let rhsMatrixForm = matrix<'T>([| rhs.element |])
+
+        // Compute inverse matrix for L, D, U of RREF-decomposition.
+        // This will be used to form (U^-1)(D^-1)(L^-1)PA=R 
+        let lowerInverse = Inverse rrefResult.Lower
+        let diagonalInverse = matrix<'T>(rrefResult.Diagonal.rowCnt, rrefResult.Diagonal.columnCnt, (Array2D.init rrefResult.Diagonal.rowCnt rrefResult.Diagonal.columnCnt (fun idx0 idx1 -> if idx0=idx1 then LanguagePrimitives.GenericOne<'T> / rrefResult.Diagonal.element.[idx0, idx1] else LanguagePrimitives.GenericZero<'T>)))
+        let upperInverse = Inverse rrefResult.Upper
+
+        // Apply matrix multiplication by U^-1, D^-1, L^-1 and P to RHS matrix.
+        let rrefRHS = Matrix.Multiply upperInverse (Matrix.Multiply diagonalInverse (Matrix.Multiply lowerInverse (Matrix.Multiply rrefResultPermutation rhsMatrixForm)))
+
+        // Find pivot location.
+        let mutable pivots = ref ([| |] : int [])
+        let mutable pivotCheckRow = 0
+        while (pivotCheckRow < mat.rowCnt) do
+            let mutable pivotCheckColumn = pivotCheckRow
+            while (pivotCheckColumn < mat.columnCnt) do
+                if (rrefResultRREF.element.[pivotCheckRow, pivotCheckColumn] = LanguagePrimitives.GenericOne<'T>) then 
+                    pivots.Value <- Array.append pivots.Value [| pivotCheckColumn |]
+                    // TODO
+                else
+                    pivotCheckColumn <- pivotCheckColumn + 1
+            pivotCheckRow <- pivotCheckRow + 1
+
+        // Find free columns.
+        let mutable freeColumnLocations = Array.except pivots.Value [| 0 .. mat.columnCnt-1 |]
+        
+        // Generate solution.
+        let result = vector<'T>(Array.init mat.columnCnt (fun idx -> LanguagePrimitives.GenericZero<'T>))
+        Array.iteri (fun idx elem -> result.element.[elem] <- rrefRHS.element.[idx, 0]) pivots.Value
+
+        result
