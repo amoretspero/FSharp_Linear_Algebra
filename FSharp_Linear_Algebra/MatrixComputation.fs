@@ -153,7 +153,7 @@ module Matrix =
         let rrefResultPermutation = rrefResult.Permutation
 
         // Convert vector RHS to matrix form.
-        let rhsMatrixForm = matrix<'T>([| rhs.element |])
+        let rhsMatrixForm = matrix<'T>(rhs.dim, 1, (Array2D.init rhs.dim 1 (fun idx0 idx1 -> rhs.element.[idx0])))
 
         // Compute inverse matrix for L, D, U of RREF-decomposition.
         // This will be used to form (U^-1)(D^-1)(L^-1)PA=R 
@@ -164,15 +164,23 @@ module Matrix =
         // Apply matrix multiplication by U^-1, D^-1, L^-1 and P to RHS matrix.
         let rrefRHS = Matrix.Multiply upperInverse (Matrix.Multiply diagonalInverse (Matrix.Multiply lowerInverse (Matrix.Multiply rrefResultPermutation rhsMatrixForm)))
 
+        (*rrefResult.RREF.Format() |> printfn "RREF: \n%A"
+        rrefResult.Lower.Format() |> printfn "Lower: \n%A"
+        rrefResult.Diagonal.Format() |> printfn "Diagonal: \n%A"
+        rrefResult.Upper.Format() |> printfn "Upper: \n%A"
+        rrefResult.Permutation.Format() |> printfn "Permutation: \n%A"
+        rrefRHS.Format() |> printfn "rrefRHS: \n%A"*)
+
         // Find pivot location.
         let mutable pivots = ref ([| |] : int [])
         let mutable pivotCheckRow = 0
         while (pivotCheckRow < mat.rowCnt) do
             let mutable pivotCheckColumn = pivotCheckRow
-            while (pivotCheckColumn < mat.columnCnt) do
+            let mutable pivotFound = false
+            while (pivotCheckColumn < mat.columnCnt && not pivotFound) do
                 if (rrefResultRREF.element.[pivotCheckRow, pivotCheckColumn] = LanguagePrimitives.GenericOne<'T>) then 
                     pivots.Value <- Array.append pivots.Value [| pivotCheckColumn |]
-                    // TODO
+                    pivotFound <- true
                 else
                     pivotCheckColumn <- pivotCheckColumn + 1
             pivotCheckRow <- pivotCheckRow + 1
@@ -185,3 +193,11 @@ module Matrix =
         Array.iteri (fun idx elem -> result.element.[elem] <- rrefRHS.element.[idx, 0]) pivots.Value
 
         result
+
+    let test() = 
+        let solveTest1 = matrix<float>([| [| 1.0; 3.0; 3.0; 2.0 |]; [| 2.0; 6.0; 9.0; 7.0 |]; [| -1.0; -3.0; 3.0; 4.0 |] |])
+        let solveTestRhs1 = vector<float>([| 1.0; 5.0; 5.0 |])
+
+        let solveTestRes1 = Solve solveTest1 solveTestRhs1
+
+        solveTestRes1

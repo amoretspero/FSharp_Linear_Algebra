@@ -3,7 +3,6 @@
 #load "RandomMatrix.fs"
 #load "Decomposition.fs"
 #load "MatrixComputation.fs"
-#load "Vector.fs"
 #r ".\\bin\\Debug\\MathNet.Numerics.dll"
 
 open FSharp_Linear_Algebra.Vector
@@ -90,6 +89,26 @@ let compareDoubleTrue (res : double matrix) (expected : double matrix) (threshol
             for j=0 to res.columnCnt - 1 do
                 if (System.Math.Abs(res.element.[i, j] - expected.element.[i, j]) > threshold) then 
                     printfn "Diff >> Element[%d, %d]: Expected %A, Got %A" i j expected.element.[i, j] res.element.[i, j]
+        total <- total + 1
+        failed <- failed + 1
+        false
+
+let compareDoubleVectorTrue (res : double vector) (expected : double vector) (threshold : double) = 
+    let mutable diff = false
+    for i=0 to res.dim-1 do
+        if (System.Math.Abs(res.element.[i] - expected.element.[i]) > threshold) then diff <- true
+    if not diff then
+        printfn "Test #%d success." (total+1)
+        total <- total + 1
+        passed <- passed + 1
+        true
+    else
+        printfn "Test #%d failed." (total+1)
+        printfn "Expected: \n%s" (expected.Format())
+        printfn "Got: \n%s" (res.Format())
+        for i=0 to res.dim-1 do
+            if (System.Math.Abs(res.element.[i] - expected.element.[i]) > threshold) then
+                printfn "Diff >> Element[%d]: Expected %A, Got %A" i expected.element.[i] res.element.[i]
         total <- total + 1
         failed <- failed + 1
         false
@@ -256,6 +275,26 @@ compareDoubleTrue nullSpaceTestResMat1 nullSpaceTestRef1 doublePrecision
 
 printPrologue("Null-Space - Test from book 2")
 compareDoubleTrue nullSpaceTestResMat2 nullSpaceTestRef2 doublePrecision
+
+// Ax=b solver test.
+
+let solveTest1 = matrix<float>([| [| 1.0; 3.0; 3.0; 2.0 |]; [| 2.0; 6.0; 9.0; 7.0 |]; [| -1.0; -3.0; 3.0; 4.0 |] |])
+let solveTest2 = matrix<double>([| [| 1.0; 2.0; 3.0; 5.0 |]; [| 2.0; 4.0; 8.0; 12.0 |]; [| 3.0; 6.0; 7.0; 13.0 |] |])
+
+let solveTestRhs1 = vector<float>([| 1.0; 5.0; 5.0 |])
+let solveTestRhs2 = vector<float>([| 0.0; 6.0; -6.0 |])
+
+let solveTestRes1 = Matrix.Solve solveTest1 solveTestRhs1
+let solveTestRes2 = Matrix.Solve solveTest2 solveTestRhs2
+
+let solveTestRef1 = vector<double>([| -2.0; 0.0; 1.0; 0.0 |])
+let solveTestRef2 = vector<double>([| -9.0; 0.0; 3.0; 0.0 |])
+
+printPrologue("Ax=b Solver - Test from book 1")
+compareDoubleVectorTrue solveTestRes1 solveTestRef1 doublePrecision
+
+printPrologue("Ax=b Solver - Test from book 2")
+compareDoubleVectorTrue solveTestRes2 solveTestRef2 doublePrecision
 
 // End test.
 endTest()
