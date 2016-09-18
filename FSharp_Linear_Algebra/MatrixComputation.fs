@@ -188,7 +188,7 @@ module Matrix =
         // Check if given linear system is solvable. If not, throw error.
         let mutable solvable = true
         let rank = pivots.Value.Length
-        for i=rank to mat.columnCnt-1 do
+        for i=rank to mat.rowCnt-1 do
             if rrefRHS.element.[i, 0] <> LanguagePrimitives.GenericZero<'T> then solvable <- false
         if not solvable then raise UnsolvableLinearSystem
 

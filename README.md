@@ -10,10 +10,11 @@ Library for linear algebra made with F#.
   
 ## Update History  
   
-### 0.4.0.0 -> 0.4.1.0  
+### 0.4.1.0 -> 0.4.2.0  
   
-- Finding inverse matrix is now available.  
-- Inverse matrix computation is based on LDU decomposition and backward/forward substitution.  
+- Supports RREF(Row-Reduced Echelon Form)-decomposition for any m by n matrix.  
+- Supports column-space, null-space calculation of matrices.  
+- Solving linear system of Ax=b (A : m by n matrix, x : n-dim vector, b : m-dim vector) is now possible.  
   
 ## Description  
 This project is to provide F#-made linear algebra library.  
@@ -93,7 +94,10 @@ let doubleMatrixFromFile = Matrix.ReadFromFileDouble ".\DoubleMatrix.txt"
 4) Transpose - <code>Matrix.Transpose()</code>  
 5) Scalar multiplication - <code>Matrix.ScalarMultiply()</code>  
 6) Identity matrix - <code>Matrix.Identity()</code>  
-7) Inverse matrix - <code>Matrix.Inverse()</code>
+7) Inverse matrix - <code>Matrix.Inverse()</code>  
+8) Column space - <code>Matrix.ColumnSpace()</code>  
+9) Null Space - <code>Matrix.NullSpace()</code>  
+10) Solve - <code>Matrix.Solve()</code>
 
 ```fsharp
 open FSharp_Linear_Algebra.Matrix
@@ -129,7 +133,23 @@ matrixIdentity.Format() |> printfn "matrixIdentity: \n%s"
 
 // Inverse matrix
 let matrixInverse = Matrix.Inverse matrix6
-matrixInverse.Format() |> printfn "matrixInverse: \n%s
+matrixInverse.Format() |> printfn "matrixInverse: \n%s"
+
+// Column space
+let columnSpaceResult = Matrix.ColumnSpace matrix8
+for vec in columnSpaceResult do vec.Format() |> printfn "Basis of column space: \n%s"
+printfn ""
+
+// Null space
+let nullSpaceResult = Matrix.NullSpace matrix8
+for vec in nullSpaceResult do vec.Format() |> printfn "Basis of null space: \n%s"
+printfn ""
+
+// Solve
+let matrixSolverRHS = vector<double>([| 1.0; 5.0; 5.0 |])
+let matrixSolverResult = Matrix.Solve matrix8 matrixSolverRHS
+matrixSolverResult.Format() |> printfn "Solver result: \n%s"
+printfn ""
 
 (*
 Output: 
@@ -169,27 +189,52 @@ matrixInverse:
 0.50000	-0.37500	-0.25000	
 -1.000	1.000	1.000	
 
+Basis of column space: 
+[1 , 2 , -1 ]
+Basis of column space: 
+[3 , 9 , 3 ]
+
+Basis of null space: 
+[-3 , 1 , 0 , 0 ]
+Basis of null space: 
+[1 , 0 , -1 , 1 ]
+
+Solver result: 
+[-2 , 0 , 1 , 0 ]
+
 *)
 ```  
   
 **Decomposition** : Decomposition of matrix is provided.  
 1) LDU-decomposition - <code>Matrix.Decomposition.LDUdecomposition()</code>  
+2) RREF-decomposition - <code>Matrix.Decomposition.RREFdecomposition()</code>
 
 ```fsharp
 open FSharp_Linear_Algebra.Matrix
 open FSharp_Linear_Algebra.Matrix.Decomposition
 
 // Random double matrix.
-let matrix8 = RandomMatrix().RandomMatrixDouble 5 5
+let matrix9 = RandomMatrix().RandomMatrixDouble 5 5
+let matrix10 = RandomMatrix().RandomMatrixDouble 4 6
 
 // LDU-decompose matrix.
-let matrix8LU = Decomposition.LDUdecomposition matrix8
+let matrix9LU = Decomposition.LDUdecomposition matrix9
 
 // Check P, L, D, U.
-printfn "LDU-decomposition result - permutation matrix P : \n%A" (matrix8LU.Permutation.Format())
-printfn "LDU-decomposition result - lower triangular matrix L : \n%A" (matrix8LU.Lower.Format())
-printfn "LDU-decomposition result - diagonal matrix D : \n%A" (matrix8LU.Diagonal.Format())
-printfn "LDU-decomposition result - upper triangular matrix U : \n%A" (matrix8LU.Upper.Format())
+printfn "LDU-decomposition result - permutation matrix P : \n%A" (matrix9LU.Permutation.Format())
+printfn "LDU-decomposition result - lower triangular matrix L : \n%A" (matrix9LU.Lower.Format())
+printfn "LDU-decomposition result - diagonal matrix D : \n%A" (matrix9LU.Diagonal.Format())
+printfn "LDU-decomposition result - upper triangular matrix U : \n%A" (matrix9LU.Upper.Format())
+
+// RREF-decompose matrix.
+let matrix10RREF = Decomposition.RREFdecomposition matrix10
+
+// Check P, L, D, U, R
+printfn "RREF-decomposition result - permutation matrix P : \n%A" (matrix10RREF.Permutation.Format())
+printfn "RREF-decomposition result - lower matrix L : \n%A" (matrix10RREF.Lower.Format())
+printfn "RREF-decomposition result - diagonal matrix D : \n%A" (matrix10RREF.Diagonal.Format())
+printfn "RREF-decomposition result - upper matrix U : \n%A" (matrix10RREF.Upper.Format())
+printfn "RREF-decomposition result - row-reduced echelon form matrix R : \n%A" (matrix10RREF.RREF.Format())
 
 (*
 Output will be (since random, results will vary) :
@@ -221,6 +266,36 @@ LDU-decomposition result - upper triangular matrix U :
 0	0	1	0.358018525062971	0.796112066982027	
 0	0	0	1	-2.96933778536181	
 0	0	0	0	1	
+"
+RREF-decomposition result - permutation matrix P : 
+"1	0	0	0	
+0	0	1	0	
+0	0	0	1	
+0	1	0	0	
+"
+RREF-decomposition result - lower matrix L : 
+"1	0	0	0	
+0.9535784851072	1	0	0	
+0.527288198847576	0.46956950844709	1	0	
+0.334476937476073	-0.0218903515260848	-0.62438804542556	1	
+"
+RREF-decomposition result - diagonal matrix D : 
+"0.753324252904078	0	0	0	
+0	-0.379502444666017	0	0	
+0	0	-0.101856058152057	0	
+0	0	0	0.0847669578101374	
+"
+RREF-decomposition result - upper matrix U : 
+"1	1.30696035806646	1.05408676749352	1.04405797143949	
+0	1	1.11920725818051	-0.342936070083238	
+0	0	1	0.395603364762073	
+0	0	0	1	
+"
+RREF-decomposition result - row-reduced echelon form matrix R : 
+"1	0	0	0	-6.965740643683	-14.6999169103296	
+0	1	0	0	4.38431226497532	11.6898662777569	
+0	0	1	0	-3.38679671772621	-6.40875568979755	
+0	0	0	1	4.85267767956053	7.04913469209129	
 "
 
 *)
