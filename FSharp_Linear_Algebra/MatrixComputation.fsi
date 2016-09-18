@@ -51,4 +51,4 @@ module Matrix =
     /// <param name="mat">Matrix of coefficients, A.</param>
     /// <param name="rhs">Right-hand side of equation, b.</param>
     /// <returns>Particular solution to Ax=b as vector.</returns>
-    val inline Solve : mat : 'T matrix -> rhs : 'T vector -> 'T vector // TODO: inline conditions.
+    val inline Solve : mat : 'T matrix -> rhs : 'T vector -> threshold : 'T -> 'T vector // TODO: inline conditions.

@@ -193,18 +193,6 @@ module Matrix =
         let rank = pivots.Value.Length
         for i=rank to mat.rowCnt-1 do
             if (genericAbs rrefRHS.element.[i, 0]) > threshold then 
-                (*match typeof<'T> with
-                | t when t = typeof<System.Double> ->
-                    if (rrefRHS.element.[i, 0] > 10E-12) then
-                        solvable <- false
-                        printfn "Error value: %A" rrefRHS.element.[i, 0]
-                | t when t = typeof<System.Single> ->
-                    if (rrefRHS.element.[i, 0] > 0.000001) then
-                        solvable <- false
-                        printfn "Error value: %A" rrefRHS.element.[i, 0]
-                | _ ->
-                    solvable <- false
-                    printfn "Error value: %A" rrefRHS.element.[i, 0]*)
                 solvable <- false
                 printfn "Error value: %A" rrefRHS.element.[i, 0]
         if not solvable then 
