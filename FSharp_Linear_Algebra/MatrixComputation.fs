@@ -4,6 +4,9 @@ open FSharp_Linear_Algebra.Vector
 open FSharp_Linear_Algebra.Matrix
 open FSharp_Linear_Algebra.Matrix.Decomposition
 
+/// <summary>Thrown when given linear system is not solvable.</summary>
+exception UnsolvableLinearSystem
+
 module Matrix =
     
     /// <summary>Computes inverse of given matrix by LDU-decomposition.</summary>
@@ -146,6 +149,7 @@ module Matrix =
     /// <param name="mat">Matrix of coefficients, A.</param>
     /// <param name="rhs">Right-hand side of equation, b.</param>
     /// <returns>Particular solution to Ax=b as vector.</returns>
+    /// <exception cref="FSharp_Linear_Algebra.Matrix.Computation.UnsolvableLinearSystem">Thrown when given linear system is not solvable.</exception>
     let inline Solve (mat : 'T matrix) (rhs : 'T vector) : 'T vector =
         // Decompose given matrix to RREF.
         let rrefResult = Decomposition.RREFdecomposition mat
@@ -164,13 +168,6 @@ module Matrix =
         // Apply matrix multiplication by U^-1, D^-1, L^-1 and P to RHS matrix.
         let rrefRHS = Matrix.Multiply upperInverse (Matrix.Multiply diagonalInverse (Matrix.Multiply lowerInverse (Matrix.Multiply rrefResultPermutation rhsMatrixForm)))
 
-        (*rrefResult.RREF.Format() |> printfn "RREF: \n%A"
-        rrefResult.Lower.Format() |> printfn "Lower: \n%A"
-        rrefResult.Diagonal.Format() |> printfn "Diagonal: \n%A"
-        rrefResult.Upper.Format() |> printfn "Upper: \n%A"
-        rrefResult.Permutation.Format() |> printfn "Permutation: \n%A"
-        rrefRHS.Format() |> printfn "rrefRHS: \n%A"*)
-
         // Find pivot location.
         let mutable pivots = ref ([| |] : int [])
         let mutable pivotCheckRow = 0
@@ -188,16 +185,15 @@ module Matrix =
         // Find free columns.
         let mutable freeColumnLocations = Array.except pivots.Value [| 0 .. mat.columnCnt-1 |]
         
+        // Check if given linear system is solvable. If not, throw error.
+        let mutable solvable = true
+        let rank = pivots.Value.Length
+        for i=rank to mat.columnCnt-1 do
+            if rrefRHS.element.[i, 0] <> LanguagePrimitives.GenericZero<'T> then solvable <- false
+        if not solvable then raise UnsolvableLinearSystem
+
         // Generate solution.
         let result = vector<'T>(Array.init mat.columnCnt (fun idx -> LanguagePrimitives.GenericZero<'T>))
         Array.iteri (fun idx elem -> result.element.[elem] <- rrefRHS.element.[idx, 0]) pivots.Value
 
         result
-
-    let test() = 
-        let solveTest1 = matrix<float>([| [| 1.0; 3.0; 3.0; 2.0 |]; [| 2.0; 6.0; 9.0; 7.0 |]; [| -1.0; -3.0; 3.0; 4.0 |] |])
-        let solveTestRhs1 = vector<float>([| 1.0; 5.0; 5.0 |])
-
-        let solveTestRes1 = Solve solveTest1 solveTestRhs1
-
-        solveTestRes1
