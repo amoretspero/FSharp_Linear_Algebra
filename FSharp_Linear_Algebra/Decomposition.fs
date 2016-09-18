@@ -1,4 +1,4 @@
-﻿namespace FSharp_Linear_Algebra.Matrix.Decomposition
+﻿namespace FSharp_Linear_Algebra.Matrix
 
 open System
 open System.Collections

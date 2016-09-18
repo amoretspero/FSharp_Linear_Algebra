@@ -5,7 +5,6 @@
 #load "MatrixComputation.fs"
 
 open FSharp_Linear_Algebra.Matrix
-open FSharp_Linear_Algebra.Matrix.Decomposition
 open FSharp_Linear_Algebra.Matrix.Computation
 open FSharp_Linear_Algebra.Vector
 
@@ -101,7 +100,7 @@ printfn ""
 
 // Solve
 let matrixSolverRHS = vector<double>([| 1.0; 5.0; 5.0 |])
-let matrixSolverResult = Matrix.Solve matrix8 matrixSolverRHS
+let matrixSolverResult = Matrix.Solve matrix8 matrixSolverRHS 10E-8
 matrixSolverResult.Format() |> printfn "Solver result: \n%s"
 printfn ""
 

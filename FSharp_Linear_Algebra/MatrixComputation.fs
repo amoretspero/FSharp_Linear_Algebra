@@ -2,7 +2,7 @@
 
 open FSharp_Linear_Algebra.Vector
 open FSharp_Linear_Algebra.Matrix
-open FSharp_Linear_Algebra.Matrix.Decomposition
+open FSharp_Linear_Algebra.Matrix
 
 /// <summary>Thrown when given linear system is not solvable.</summary>
 exception UnsolvableLinearSystem
@@ -72,7 +72,7 @@ module Matrix =
             
             Matrix.Multiply (Matrix.Multiply (Matrix.Multiply upperInverse diagonalInverse) lowerInverse) permutation
         with
-            | :? FSharp_Linear_Algebra.Matrix.Decomposition.NoLDUDecompositionPossible -> raise NotInvertible
+            | :? FSharp_Linear_Algebra.Matrix.NoLDUDecompositionPossible -> raise NotInvertible
 
     /// <summary>Computes column space of given matrix.</summary>
     /// <param name="mat">Matrix to compute column space of.</param>
@@ -148,9 +148,12 @@ module Matrix =
     /// <summary>Solves system of linear equations, Ax=b. Solution dose not include null-space solutions.</summary>
     /// <param name="mat">Matrix of coefficients, A.</param>
     /// <param name="rhs">Right-hand side of equation, b.</param>
+    /// <param name="threshold">Threshold of deciding whether given linear system if solvable or not.</param>
     /// <returns>Particular solution to Ax=b as vector.</returns>
     /// <exception cref="FSharp_Linear_Algebra.Matrix.Computation.UnsolvableLinearSystem">Thrown when given linear system is not solvable.</exception>
-    let inline Solve (mat : 'T matrix) (rhs : 'T vector) : 'T vector =
+    let inline Solve (mat : 'T matrix) (rhs : 'T vector) (threshold : 'T) : 'T vector =
+        let genericAbs (a : 'T) = 
+            if a >= LanguagePrimitives.GenericZero<'T> then a else LanguagePrimitives.GenericZero<'T> - a
         // Decompose given matrix to RREF.
         let rrefResult = Decomposition.RREFdecomposition mat
         let rrefResultRREF = rrefResult.RREF
@@ -189,8 +192,23 @@ module Matrix =
         let mutable solvable = true
         let rank = pivots.Value.Length
         for i=rank to mat.rowCnt-1 do
-            if rrefRHS.element.[i, 0] <> LanguagePrimitives.GenericZero<'T> then solvable <- false
-        if not solvable then raise UnsolvableLinearSystem
+            if (genericAbs rrefRHS.element.[i, 0]) > threshold then 
+                (*match typeof<'T> with
+                | t when t = typeof<System.Double> ->
+                    if (rrefRHS.element.[i, 0] > 10E-12) then
+                        solvable <- false
+                        printfn "Error value: %A" rrefRHS.element.[i, 0]
+                | t when t = typeof<System.Single> ->
+                    if (rrefRHS.element.[i, 0] > 0.000001) then
+                        solvable <- false
+                        printfn "Error value: %A" rrefRHS.element.[i, 0]
+                | _ ->
+                    solvable <- false
+                    printfn "Error value: %A" rrefRHS.element.[i, 0]*)
+                solvable <- false
+                printfn "Error value: %A" rrefRHS.element.[i, 0]
+        if not solvable then 
+            raise UnsolvableLinearSystem
 
         // Generate solution.
         let result = vector<'T>(Array.init mat.columnCnt (fun idx -> LanguagePrimitives.GenericZero<'T>))

@@ -8,7 +8,6 @@
 open FSharp_Linear_Algebra.Vector
 open FSharp_Linear_Algebra.Matrix
 open FSharp_Linear_Algebra.Matrix.Computation
-open FSharp_Linear_Algebra.Matrix.Decomposition
 open MathNet.Numerics
 
 // Test settings. - Helper functions, global variables, etc.
@@ -284,8 +283,8 @@ let solveTest2 = matrix<double>([| [| 1.0; 2.0; 3.0; 5.0 |]; [| 2.0; 4.0; 8.0; 1
 let solveTestRhs1 = vector<float>([| 1.0; 5.0; 5.0 |])
 let solveTestRhs2 = vector<float>([| 0.0; 6.0; -6.0 |])
 
-let solveTestRes1 = Matrix.Solve solveTest1 solveTestRhs1
-let solveTestRes2 = Matrix.Solve solveTest2 solveTestRhs2
+let solveTestRes1 = Matrix.Solve solveTest1 solveTestRhs1 doublePrecision
+let solveTestRes2 = Matrix.Solve solveTest2 solveTestRhs2 doublePrecision
 
 let solveTestRef1 = vector<double>([| -2.0; 0.0; 1.0; 0.0 |])
 let solveTestRef2 = vector<double>([| -9.0; 0.0; 3.0; 0.0 |])

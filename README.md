@@ -147,7 +147,7 @@ printfn ""
 
 // Solve
 let matrixSolverRHS = vector<double>([| 1.0; 5.0; 5.0 |])
-let matrixSolverResult = Matrix.Solve matrix8 matrixSolverRHS
+let matrixSolverResult = Matrix.Solve matrix8 matrixSolverRHS 10E-8
 matrixSolverResult.Format() |> printfn "Solver result: \n%s"
 printfn ""
 
