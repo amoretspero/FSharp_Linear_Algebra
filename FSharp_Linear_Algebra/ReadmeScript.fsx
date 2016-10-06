@@ -1,10 +1,10 @@
 ﻿#load "Matrix.fs"
 #load "RandomMatrix.fs"
+#load "Vector.fs"
 #load "Decomposition.fs"
 #load "MatrixComputation.fs"
-#load "Vector.fs"
+
 open FSharp_Linear_Algebra.Matrix
-open FSharp_Linear_Algebra.Matrix.Decomposition
 open FSharp_Linear_Algebra.Matrix.Computation
 open FSharp_Linear_Algebra.Vector
 
@@ -58,6 +58,7 @@ let doubleMatrixFromFile = Matrix.ReadFromFileDouble ".\\DoubleMatrix.txt"
 // Matrix initialization.
 let matrix6 = matrix<decimal>([| [| 2M; 1M; 1M; |]; [| 4M; -6M; 0M; |]; [| -2M; 7M; 2M; |] |])
 let matrix7 = matrix<decimal>([| [| 1M; 1M; 1M; |]; [| 2M; 2M; 5M; |]; [| 4M; 6M; 8M; |] |])
+let matrix8 = matrix<double>([| [| 1.0; 3.0; 3.0; 2.0 |]; [| 2.0; 6.0; 9.0; 7.0 |]; [| -1.0; -3.0; 3.0; 4.0 |] |])
 
 // Addition
 let matrixAdd = Matrix.Add matrix6  matrix7
@@ -87,19 +88,51 @@ matrixIdentity.Format() |> printfn "matrixIdentity: \n%s"
 let matrixInverse = Matrix.Inverse matrix6
 matrixInverse.Format() |> printfn "matrixInverse: \n%s"
 
+// Column space
+let columnSpaceResult = Matrix.ColumnSpace matrix8
+for vec in columnSpaceResult do vec.Format() |> printfn "Basis of column space: \n%s"
+printfn ""
+
+// Null space
+let nullSpaceResult = Matrix.NullSpace matrix8
+for vec in nullSpaceResult do vec.Format() |> printfn "Basis of null space: \n%s"
+printfn ""
+
+// Rank
+let rankResult = Matrix.Rank matrix8
+printfn "Rank of matrix \n%A is: %d\n" (matrix8.Format()) rankResult
+
+// Solve
+let matrixSolverRHS = vector<double>([| 1.0; 5.0; 5.0 |])
+let matrixSolverResult = Matrix.Solve matrix8 matrixSolverRHS 10E-8
+matrixSolverResult.Format() |> printfn "Solver result: \n%s"
+printfn ""
+
+
 // Matrix - decomposition
 
 // Random double matrix.
-let matrix8 = RandomMatrix().RandomMatrixDouble 5 5
+let matrix9 = RandomMatrix().RandomMatrixDouble 5 5
+let matrix10 = RandomMatrix().RandomMatrixDouble 4 6
 
 // LDU-decompose matrix.
-let matrix8LU = Decomposition.LDUdecomposition matrix8
+let matrix9LU = Decomposition.LDUdecomposition matrix9
 
 // Check P, L, D, U.
-printfn "LDU-decomposition result - permutation matrix P : \n%A" (matrix8LU.Permutation.Format())
-printfn "LDU-decomposition result - lower triangular matrix L : \n%A" (matrix8LU.Lower.Format())
-printfn "LDU-decomposition result - diagonal matrix D : \n%A" (matrix8LU.Diagonal.Format())
-printfn "LDU-decomposition result - upper triangular matrix U : \n%A" (matrix8LU.Upper.Format())
+printfn "LDU-decomposition result - permutation matrix P : \n%A" (matrix9LU.Permutation.Format())
+printfn "LDU-decomposition result - lower triangular matrix L : \n%A" (matrix9LU.Lower.Format())
+printfn "LDU-decomposition result - diagonal matrix D : \n%A" (matrix9LU.Diagonal.Format())
+printfn "LDU-decomposition result - upper triangular matrix U : \n%A" (matrix9LU.Upper.Format())
+
+// RREF-decompose matrix.
+let matrix10RREF = Decomposition.RREFdecomposition matrix10
+
+// Check P, L, D, U, R
+printfn "RREF-decomposition result - permutation matrix P : \n%A" (matrix10RREF.Permutation.Format())
+printfn "RREF-decomposition result - lower matrix L : \n%A" (matrix10RREF.Lower.Format())
+printfn "RREF-decomposition result - diagonal matrix D : \n%A" (matrix10RREF.Diagonal.Format())
+printfn "RREF-decomposition result - upper matrix U : \n%A" (matrix10RREF.Upper.Format())
+printfn "RREF-decomposition result - row-reduced echelon form matrix R : \n%A" (matrix10RREF.RREF.Format())
 
 // ------------------------------------------------------------------
 

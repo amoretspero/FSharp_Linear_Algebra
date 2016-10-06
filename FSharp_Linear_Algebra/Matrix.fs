@@ -130,7 +130,7 @@ module Matrix =
     /// <param name="matrix2">Matrix to be multiplied. Right side.</param>
     /// <returns>Returns matrix multiplied. Size is (# of rows in matrix1) * (# of columns in matrix2)</returns>
     let inline Multiply (matrix1 : 'T matrix) (matrix2 : 'T matrix) =
-        do if matrix1.columnCnt <> matrix2.rowCnt then failwith "Matrix sizes does not match." // Check if matrix size matches. 
+        do if matrix1.columnCnt <> matrix2.rowCnt then failwith ("Matrix size does not match. Attempted ["+(matrix1.rowCnt.ToString())+" by "+(matrix1.columnCnt.ToString())+"] * ["+(matrix2.rowCnt.ToString())+" by "+(matrix2.columnCnt.ToString())+"].") // Check if matrix size matches. 
         let res = Array2D.create matrix1.rowCnt matrix2.columnCnt LanguagePrimitives.GenericZero // Create 2d-array for matrix element with generic zero.
         for i=1 to matrix1.rowCnt do
             let row = matrix1.element.[i-1, *]

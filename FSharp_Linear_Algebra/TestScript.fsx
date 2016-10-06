@@ -1,13 +1,13 @@
 ﻿#load "Matrix.fs"
+#load "Vector.fs"
 #load "RandomMatrix.fs"
 #load "Decomposition.fs"
 #load "MatrixComputation.fs"
-#load "Vector.fs"
-#r ".\\bin\\Debug\\MathNet.Numerics.dll"
+#r "..\\packages\\MathNet.Numerics.3.13.1\\lib\\net40\\MathNet.Numerics.dll"
 
+open FSharp_Linear_Algebra.Vector
 open FSharp_Linear_Algebra.Matrix
 open FSharp_Linear_Algebra.Matrix.Computation
-open FSharp_Linear_Algebra.Matrix.Decomposition
 open MathNet.Numerics
 
 // Test settings. - Helper functions, global variables, etc.
@@ -52,6 +52,23 @@ let compareTrue (res : 'T matrix) (expected : 'T matrix) =
         failed <- failed + 1
         false
 
+let compareSpaceTrue (res : vector<'T> []) (expected : vector<'T> []) =
+    if res = expected then
+        printfn "Test #%d success." (total+1)
+        total <- total + 1
+        passed <- passed + 1
+        true
+    else
+        printfn "Test #%d failed." (total+1)
+        printfn "Expected: \n%s" (String.concat System.Environment.NewLine (Array.map (fun (x : 'T vector) -> x.Format()) res))
+        printfn "Got: \n%s" (String.concat System.Environment.NewLine (Array.map (fun (x : 'T vector) -> x.Format()) expected))
+        for i=0 to res.Length-1 do
+            for j=0 to res.[i].dim-1 do
+                if expected.[i].element.[j] <> res.[i].element.[j] then printfn "Diff >> vector #%d [%d]: Expected %A, got %A" i j expected.[i].element.[j] res.[i].element.[j]
+        total <- total + 1
+        failed <- failed + 1
+        false
+
 let compareDoubleTrue (res : double matrix) (expected : double matrix) (threshold : double) = 
     let mutable diff = false
     for i=0 to res.rowCnt-1 do
@@ -70,7 +87,41 @@ let compareDoubleTrue (res : double matrix) (expected : double matrix) (threshol
         for i=0 to res.rowCnt - 1 do
             for j=0 to res.columnCnt - 1 do
                 if (System.Math.Abs(res.element.[i, j] - expected.element.[i, j]) > threshold) then 
-                    printfn "Diff >> Element[%d, %d]: Expected %A, Got %A" i j res.element.[i, j] expected.element.[i, j]
+                    printfn "Diff >> Element[%d, %d]: Expected %A, Got %A" i j expected.element.[i, j] res.element.[i, j]
+        total <- total + 1
+        failed <- failed + 1
+        false
+
+let compareIntTrue (res : int) (expected : int) =
+    if res = expected then
+        printfn "Test #%d success." (total + 1)
+        total <- total + 1
+        passed <- passed + 1
+        true
+    else
+        printfn "Test #%d failed." (total + 1)
+        printfn "Expected : \n%d" expected
+        printfn "Got: \n%d" res
+        total <- total + 1
+        failed <- failed + 1
+        false
+
+let compareDoubleVectorTrue (res : double vector) (expected : double vector) (threshold : double) = 
+    let mutable diff = false
+    for i=0 to res.dim-1 do
+        if (System.Math.Abs(res.element.[i] - expected.element.[i]) > threshold) then diff <- true
+    if not diff then
+        printfn "Test #%d success." (total+1)
+        total <- total + 1
+        passed <- passed + 1
+        true
+    else
+        printfn "Test #%d failed." (total+1)
+        printfn "Expected: \n%s" (expected.Format())
+        printfn "Got: \n%s" (res.Format())
+        for i=0 to res.dim-1 do
+            if (System.Math.Abs(res.element.[i] - expected.element.[i]) > threshold) then
+                printfn "Diff >> Element[%d]: Expected %A, Got %A" i expected.element.[i] res.element.[i]
         total <- total + 1
         failed <- failed + 1
         false
@@ -149,8 +200,6 @@ let testRef = MathNet.Numerics.LinearAlgebra.Matrix.Build.DenseOfArray(test.elem
 let testLU = Decomposition.LDUdecomposition test
 let testRefLU = testRef.LU()
 
-printfn "Original matrix: \n%A" (test.Format())
-
 printPrologue("LDU decomposition - Self test") // Tests if PA=LDU.
 compareDoubleTrue (Matrix.Multiply (Matrix.Multiply testLU.Lower testLU.Diagonal) testLU.Upper) (Matrix.Multiply testLU.Permutation test) doublePrecision
 
@@ -173,6 +222,106 @@ compareDoubleTrue (Matrix.Multiply inverseTest inverseTestRes) (Matrix.Identity 
 
 printPrologue("Inverse matrix - Referenct test") // Tests if Inverse matrix is same with MathNet reference.
 compareDoubleTrue (matrix<double>(inverseTest.rowCnt, inverseTest.columnCnt, inverseTestRefRes.Storage.ToArray())) inverseTestRes doublePrecision
+
+// Row-Reduced Echelon Form test.
+
+let rrefTest1 = matrix<double>([| [| 1.0; 3.0; 3.0; 2.0 |]; [| 2.0; 6.0; 9.0; 7.0 |]; [| -1.0; -3.0; 3.0; 4.0 |] |])
+let rrefTest2 = matrix<double>([| [| 1.0; 2.0; 3.0; 5.0 |]; [| 2.0; 4.0; 8.0; 12.0 |]; [| 3.0; 6.0; 7.0; 13.0 |] |])
+let rrefTest3 = RandomMatrix().RandomMatrixDouble 16 12
+
+let rrefTestRes1 = Decomposition.RREFdecomposition rrefTest1
+let rrefTestRes2 = Decomposition.RREFdecomposition rrefTest2
+let rrefTestRes3 = Decomposition.RREFdecomposition rrefTest3
+
+printPrologue("Row-Reduced Echelon Form - Test from book 1")
+compareDoubleTrue rrefTestRes1.RREF (matrix<double>([| [| 1.0; 3.0; 0.0; -1.0; |]; [| 0.0; 0.0; 1.0; 1.0; |]; [| 0.0; 0.0; 0.0; 0.0 |] |])) doublePrecision
+
+printPrologue("Row-Reduced Echelon Form - Test from book 2")
+compareDoubleTrue rrefTestRes2.RREF (matrix<double>([| [| 1.0; 2.0; 0.0; 2.0 |]; [| 0.0; 0.0; 1.0; 1.0 |]; [| 0.0; 0.0; 0.0; 0.0 |] |])) doublePrecision
+
+printPrologue("Row-Reduced Echelon Form - Self test")
+(*rrefTestRes3.Lower.Format() |> printfn "Lower matrix - \n%A"
+rrefTestRes3.Diagonal.Format() |> printfn "Diagonal matrix - \n%A"
+rrefTestRes3.Upper.Format() |> printfn "Upper matrix - \n%A"
+rrefTestRes3.RREF.Format() |> printfn "RREF matrix - \n%A"
+(Matrix.Multiply rrefTestRes3.Upper rrefTestRes3.RREF).Format() |> printfn "UR - \n%A"
+(Matrix.Multiply (Matrix.Multiply rrefTestRes3.Diagonal rrefTestRes3.Upper) rrefTestRes3.RREF).Format() |> printfn "DUR - \n%A"
+(Matrix.Multiply (Matrix.Multiply (Matrix.Multiply rrefTestRes3.Lower rrefTestRes3.Diagonal) rrefTestRes3.Upper) rrefTestRes3.RREF).Format() |> printfn "LDUR - \n%A"*)
+compareDoubleTrue (Matrix.Multiply (Matrix.Multiply (Matrix.Multiply rrefTestRes3.Lower rrefTestRes3.Diagonal) rrefTestRes3.Upper) rrefTestRes3.RREF) (Matrix.Multiply rrefTestRes3.Permutation rrefTest3) doublePrecision
+
+// Column space test.
+
+let columnSpaceTest1 = matrix<double>([| [| 1.0; 3.0; 3.0; 2.0 |]; [| 2.0; 6.0; 9.0; 7.0 |]; [| -1.0; -3.0; 3.0; 4.0 |] |])
+let columnSpaceTest2 = matrix<double>([| [| 1.0; 2.0; 3.0; 5.0 |]; [| 2.0; 4.0; 8.0; 12.0 |]; [| 3.0; 6.0; 7.0; 13.0 |] |])
+
+let columnSpaceTestRes1 = Matrix.ColumnSpace columnSpaceTest1
+let columnSpaceTestRes2 = Matrix.ColumnSpace columnSpaceTest2
+
+let columnSpaceTestResMat1 = matrix<double>(columnSpaceTestRes1.[0].dim, columnSpaceTestRes1.Length, (Array2D.init columnSpaceTestRes1.[0].dim columnSpaceTestRes1.Length (fun idx0 idx1 -> columnSpaceTestRes1.[idx1].element.[idx0])))
+let columnSpaceTestResMat2 = matrix<double>(columnSpaceTestRes2.[0].dim, columnSpaceTestRes2.Length, (Array2D.init columnSpaceTestRes2.[0].dim columnSpaceTestRes2.Length (fun idx0 idx1 -> columnSpaceTestRes2.[idx1].element.[idx0])))
+
+let columnSpaceTestRef1 = matrix<double>([| [| 1.0; 3.0 |]; [| 2.0; 9.0 |]; [| -1.0; 3.0 |] |])
+let columnSpaceTestRef2 = matrix<double>([| [| 1.0; 3.0 |]; [| 2.0; 8.0 |]; [| 3.0; 7.0 |] |])
+
+printPrologue("Column-Space - Test from book 1")
+compareTrue columnSpaceTestResMat1 columnSpaceTestRef1
+
+printPrologue("Column-Space - Test from book 2")
+compareTrue columnSpaceTestResMat2 columnSpaceTestRef2
+
+// Rank test.
+
+let rankTest1 = matrix<double>([| [| 1.0; 3.0; 3.0; 2.0 |]; [| 2.0; 6.0; 9.0; 7.0 |]; [| -1.0; -3.0; 3.0; 4.0 |] |])
+let rankTest2 = matrix<double>([| [| 1.0; 2.0; 3.0; 5.0 |]; [| 2.0; 4.0; 8.0; 12.0 |]; [| 3.0; 6.0; 7.0; 13.0 |] |])
+
+let rankTestRes1 = Matrix.Rank rankTest1
+let rankTestRes2 = Matrix.Rank rankTest2
+
+printPrologue("Rank - Test from book 1")
+compareIntTrue rankTestRes1 2
+
+printPrologue("Rank - Test from book 2")
+compareIntTrue rankTestRes2 2
+
+// Null space test.
+
+let nullSpaceTest1 = matrix<double>([| [| 1.0; 3.0; 3.0; 2.0 |]; [| 2.0; 6.0; 9.0; 7.0 |]; [| -1.0; -3.0; 3.0; 4.0 |] |])
+let nullSpaceTest2 = matrix<double>([| [| 1.0; 2.0; 3.0; 5.0 |]; [| 2.0; 4.0; 8.0; 12.0 |]; [| 3.0; 6.0; 7.0; 13.0 |] |])
+
+let nullSpaceTestRes1 = Matrix.NullSpace nullSpaceTest1
+let nullSpaceTestRes2 = Matrix.NullSpace nullSpaceTest2
+
+let nullSpaceTestResMat1 = matrix<double>(nullSpaceTestRes1.[0].dim, nullSpaceTestRes1.Length, (Array2D.init nullSpaceTestRes1.[0].dim nullSpaceTestRes1.Length (fun idx0 idx1 -> nullSpaceTestRes1.[idx1].element.[idx0])))
+let nullSpaceTestResMat2 = matrix<double>(nullSpaceTestRes2.[0].dim, nullSpaceTestRes2.Length, (Array2D.init nullSpaceTestRes2.[0].dim nullSpaceTestRes2.Length (fun idx0 idx1 -> nullSpaceTestRes2.[idx1].element.[idx0])))
+
+let nullSpaceTestRef1 = matrix<double>([| [| -3.0; 1.0 |]; [| 1.0; 0.0 |]; [| 0.0; -1.0 |]; [| 0.0; 1.0 |] |])
+let nullSpaceTestRef2 = matrix<double>([| [| -2.0; -2.0 |]; [| 1.0; 0.0 |]; [| 0.0; -1.0 |]; [| 0.0; 1.0 |] |])
+
+printPrologue("Null-Space - Test from book 1")
+compareDoubleTrue nullSpaceTestResMat1 nullSpaceTestRef1 doublePrecision
+
+printPrologue("Null-Space - Test from book 2")
+compareDoubleTrue nullSpaceTestResMat2 nullSpaceTestRef2 doublePrecision
+
+// Ax=b solver test.
+
+let solveTest1 = matrix<float>([| [| 1.0; 3.0; 3.0; 2.0 |]; [| 2.0; 6.0; 9.0; 7.0 |]; [| -1.0; -3.0; 3.0; 4.0 |] |])
+let solveTest2 = matrix<double>([| [| 1.0; 2.0; 3.0; 5.0 |]; [| 2.0; 4.0; 8.0; 12.0 |]; [| 3.0; 6.0; 7.0; 13.0 |] |])
+
+let solveTestRhs1 = vector<float>([| 1.0; 5.0; 5.0 |])
+let solveTestRhs2 = vector<float>([| 0.0; 6.0; -6.0 |])
+
+let solveTestRes1 = Matrix.Solve solveTest1 solveTestRhs1 doublePrecision
+let solveTestRes2 = Matrix.Solve solveTest2 solveTestRhs2 doublePrecision
+
+let solveTestRef1 = vector<double>([| -2.0; 0.0; 1.0; 0.0 |])
+let solveTestRef2 = vector<double>([| -9.0; 0.0; 3.0; 0.0 |])
+
+printPrologue("Ax=b Solver - Test from book 1")
+compareDoubleVectorTrue solveTestRes1 solveTestRef1 doublePrecision
+
+printPrologue("Ax=b Solver - Test from book 2")
+compareDoubleVectorTrue solveTestRes2 solveTestRef2 doublePrecision
 
 // End test.
 endTest()

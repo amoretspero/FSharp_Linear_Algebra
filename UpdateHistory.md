@@ -1,5 +1,10 @@
 ## Update History  
   
+### 0.4.0.0 -> 0.4.1.0  
+  
+- Finding inverse matrix is now available.  
+- Inverse matrix computation is based on LDU decomposition and backward/forward substitution.  
+  
 ### 0.3.2.0 -> 0.4.0.0  
   
 - LDU decomposition is supported for generic types.  
