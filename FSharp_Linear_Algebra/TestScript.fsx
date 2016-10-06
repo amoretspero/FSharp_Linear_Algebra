@@ -92,6 +92,20 @@ let compareDoubleTrue (res : double matrix) (expected : double matrix) (threshol
         failed <- failed + 1
         false
 
+let compareIntTrue (res : int) (expected : int) =
+    if res = expected then
+        printfn "Test #%d success." (total + 1)
+        total <- total + 1
+        passed <- passed + 1
+        true
+    else
+        printfn "Test #%d failed." (total + 1)
+        printfn "Expected : \n%d" expected
+        printfn "Got: \n%d" res
+        total <- total + 1
+        failed <- failed + 1
+        false
+
 let compareDoubleVectorTrue (res : double vector) (expected : double vector) (threshold : double) = 
     let mutable diff = false
     for i=0 to res.dim-1 do
@@ -254,6 +268,20 @@ compareTrue columnSpaceTestResMat1 columnSpaceTestRef1
 
 printPrologue("Column-Space - Test from book 2")
 compareTrue columnSpaceTestResMat2 columnSpaceTestRef2
+
+// Rank test.
+
+let rankTest1 = matrix<double>([| [| 1.0; 3.0; 3.0; 2.0 |]; [| 2.0; 6.0; 9.0; 7.0 |]; [| -1.0; -3.0; 3.0; 4.0 |] |])
+let rankTest2 = matrix<double>([| [| 1.0; 2.0; 3.0; 5.0 |]; [| 2.0; 4.0; 8.0; 12.0 |]; [| 3.0; 6.0; 7.0; 13.0 |] |])
+
+let rankTestRes1 = Matrix.Rank rankTest1
+let rankTestRes2 = Matrix.Rank rankTest2
+
+printPrologue("Rank - Test from book 1")
+compareIntTrue rankTestRes1 2
+
+printPrologue("Rank - Test from book 2")
+compareIntTrue rankTestRes2 2
 
 // Null space test.
 

@@ -1,0 +1,23 @@
+{
+    "version": "0.1.0",
+    "command": "cmd",
+    "isShellCommand": true,
+    "args": [],
+    "tasks": [
+        {
+            "taskName": "build",
+            "args": [
+                "/C",
+                "C:\\Program Files (x86)\\MSBuild\\14.0\\Bin\\MSBuild.exe"
+            ]
+        },
+        {
+            "taskName": "test",
+            "args": [
+                "/C",
+                "C:\\Program Files (x86)\\Microsoft SDKs\\F#\\4.0\\Framework\\v4.0\\Fsi.exe",
+                ".\\FSharp_Linear_Algebra\\TestScript.fsx"
+            ]
+        }
+    ]
+}

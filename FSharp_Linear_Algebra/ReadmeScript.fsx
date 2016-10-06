@@ -98,6 +98,10 @@ let nullSpaceResult = Matrix.NullSpace matrix8
 for vec in nullSpaceResult do vec.Format() |> printfn "Basis of null space: \n%s"
 printfn ""
 
+// Rank
+let rankResult = Matrix.Rank matrix8
+printfn "Rank of matrix \n%A is: %d\n" (matrix8.Format()) rankResult
+
 // Solve
 let matrixSolverRHS = vector<double>([| 1.0; 5.0; 5.0 |])
 let matrixSolverResult = Matrix.Solve matrix8 matrixSolverRHS 10E-8

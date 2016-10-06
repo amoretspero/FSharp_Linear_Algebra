@@ -14,6 +14,7 @@ Library for linear algebra made with F#.
   
 - Supports RREF(Row-Reduced Echelon Form)-decomposition for any m by n matrix.  
 - Supports column-space, null-space calculation of matrices.  
+- Supports rank computation of matrices.
 - Solving linear system of Ax=b (A : m by n matrix, x : n-dim vector, b : m-dim vector) is now possible.  
   
 ## Description  
@@ -97,7 +98,8 @@ let doubleMatrixFromFile = Matrix.ReadFromFileDouble ".\DoubleMatrix.txt"
 7) Inverse matrix - <code>Matrix.Inverse()</code>  
 8) Column space - <code>Matrix.ColumnSpace()</code>  
 9) Null Space - <code>Matrix.NullSpace()</code>  
-10) Solve - <code>Matrix.Solve()</code>
+10) Rank - <code>Matrix.Rank()</code>
+11) Solve - <code>Matrix.Solve()</code>
 
 ```fsharp
 open FSharp_Linear_Algebra.Matrix
@@ -144,6 +146,10 @@ printfn ""
 let nullSpaceResult = Matrix.NullSpace matrix8
 for vec in nullSpaceResult do vec.Format() |> printfn "Basis of null space: \n%s"
 printfn ""
+
+// Rank
+let rankResult = Matrix.Rank matrix8
+printfn "Rank of matrix \n%A is: %d\n" (matrix8.Format()) rankResult
 
 // Solve
 let matrixSolverRHS = vector<double>([| 1.0; 5.0; 5.0 |])
@@ -198,6 +204,12 @@ Basis of null space:
 [-3 , 1 , 0 , 0 ]
 Basis of null space: 
 [1 , 0 , -1 , 1 ]
+
+Rank of matrix                                                                                                                                     
+"1      3       3       2                                                                                                                          
+2       6       9       7                                                                                                                          
+-1      -3      3       4                                                                                                                          
+" is: 2  
 
 Solver result: 
 [-2 , 0 , 1 , 0 ]

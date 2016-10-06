@@ -144,7 +144,32 @@ module Matrix =
             resArray.Value <- Array.append resArray.Value [| vector<'T>(resMatrix.element.[*, i]) |]
 
         resArray.Value
+    
+    /// <summary>Computes rank of given matrix with RREF-decomposition.</summary>
+    /// <param name="mat">Matrix to compute rank.</param>
+    /// <returns>Returns rank of given matrix.</returns>
+    let inline Rank (mat : 'T matrix) : int = 
+        // Decompose given matrix.
+        let rrefResult = Decomposition.RREFdecomposition mat
+        let rrefResultRREF = rrefResult.RREF
 
+        // Calculate number of non-zero rows.
+        let mutable rowCheckCount = 0
+        let mutable checkEnd = false
+        while (rowCheckCount < rrefResultRREF.rowCnt && not checkEnd) do
+            let currentRow = rrefResultRREF.element.[rowCheckCount, *]
+            let mutable isZeroRow = true
+            let mutable elemCnt = 0
+            while (elemCnt < rrefResultRREF.columnCnt && isZeroRow) do
+                if currentRow.[elemCnt] <> LanguagePrimitives.GenericZero then isZeroRow <- false
+                elemCnt <- elemCnt + 1
+            if not isZeroRow then 
+                rowCheckCount <- rowCheckCount + 1
+            else
+                checkEnd <- true
+        
+        rowCheckCount
+        
     /// <summary>Solves system of linear equations, Ax=b. Solution dose not include null-space solutions.</summary>
     /// <param name="mat">Matrix of coefficients, A.</param>
     /// <param name="rhs">Right-hand side of equation, b.</param>
