@@ -6,10 +6,16 @@ Library for linear algebra made with F#.
   
 ## Version  
 **Stable** : **0.4.2.0**  
-**Unstable** : **N/A** (stable version = newest version)     
+**Unstable** : **0.4.2.1** (stable version <> newest version)     
   
 ## Update History  
   
+### 0.4.2.0 -> 0.4.2.1  
+  
+- Supports row-space, left-null-space calculation of matrices.  
+- Supports right-inverse, left-inverse calculation and existness check of matrices.  
+- May not be tested.
+
 ### 0.4.1.0 -> 0.4.2.0  
   
 - Supports RREF(Row-Reduced Echelon Form)-decomposition for any m by n matrix.  

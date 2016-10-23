@@ -18,6 +18,12 @@ exception FileNotFound of string
 /// <summary>Exception that given matrix does not have inverse.</summary>
 exception NotInvertible
 
+/// <summary>Exception that given matrix does not have right inverse.</summary>
+exception NoRightInverse
+
+/// <summary>Exception that given matrix does not have left inverse.</summary>
+exception NoLeftInverse
+
 /// <summary>Class for generic matrices.</summary>
 [<Class>]
 type matrix<'T>(rowCnt : int, columnCnt : int, element : 'T [,]) =

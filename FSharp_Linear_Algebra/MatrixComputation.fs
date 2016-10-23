@@ -8,6 +8,57 @@ open FSharp_Linear_Algebra.Matrix
 exception UnsolvableLinearSystem
 
 module Matrix =
+
+    /// <summary>Computes rank of given matrix with RREF-decomposition.</summary>
+    /// <param name="mat">Matrix to compute rank.</param>
+    /// <returns>Returns rank of given matrix.</returns>
+    let inline Rank (mat : 'T matrix) : int = 
+        // Decompose given matrix.
+        let rrefResult = Decomposition.RREFdecomposition mat
+        let rrefResultRREF = rrefResult.RREF
+
+        // Calculate number of non-zero rows.
+        let mutable rowCheckCount = 0
+        let mutable checkEnd = false
+        while (rowCheckCount < rrefResultRREF.rowCnt && not checkEnd) do
+            let currentRow = rrefResultRREF.element.[rowCheckCount, *]
+            let mutable isZeroRow = true
+            let mutable elemCnt = 0
+            while (elemCnt < rrefResultRREF.columnCnt && isZeroRow) do
+                if currentRow.[elemCnt] <> LanguagePrimitives.GenericZero then isZeroRow <- false
+                elemCnt <- elemCnt + 1
+            if not isZeroRow then 
+                rowCheckCount <- rowCheckCount + 1
+            else
+                checkEnd <- true
+        
+        rowCheckCount
+    
+    /// <summary>Check if right inverse of given matrix exists.</summary>
+    /// <param name="mat">Matrix to check if right inverse exists.</param>
+    /// <returns>True if right inverse exists, false if it does not.</returns>
+    let inline IsRightInverseExist (mat : 'T matrix) : bool =
+        // Get rank of given matrix.
+        let rank = Rank mat
+
+        // Determine existness of right inverse.
+        if rank = mat.rowCnt then true else false
+    
+    /// <summary>Check if left inverse of given matrix exists.</summary>
+    /// <param name="mat">Matrix to check if left inverse exists.</param>
+    /// <returns>True if left inverse exists, false if it does not.</returns>
+    let inline IsLeftInverseExist (mat : 'T matrix) : bool =
+        // Get rank of given matrix.
+        let rank = Rank mat
+
+        // Determine existness of left inverse.
+        if rank = mat.columnCnt then true else false
+    
+    /// <summary>Check if inverse of given matrix exists.</summary>
+    /// <param name="mat">Matrix to check if inverse exists.</param>
+    /// <returns>True if exists, false if not.</returns>
+    let inline IsInverseExist (mat : 'T matrix) : bool =
+        (IsRightInverseExist mat) && (IsLeftInverseExist mat)
     
     /// <summary>Computes inverse of given matrix by LDU-decomposition.</summary>
     /// <param name="mat">Matrix to compute inverse of.</param>
@@ -73,6 +124,30 @@ module Matrix =
             Matrix.Multiply (Matrix.Multiply (Matrix.Multiply upperInverse diagonalInverse) lowerInverse) permutation
         with
             | :? FSharp_Linear_Algebra.Matrix.NoLDUDecompositionPossible -> raise NotInvertible
+    
+    /// <summary>Computes right inverse of given matrix if exists.</summary>
+    /// <param name="mat">Matrix to compute right inverse of.</param>
+    /// <returns>Right inverse of given matrix.</returns>
+    /// <exception cref="FSharp_Linear_Algebra.Matrix.NoRightInverse">Thrown when given matrix does not have right inverse.</exception>
+    let inline RightInverse (mat : 'T matrix) : 'T matrix =
+        // Check if right inverse exists.
+        if (not (IsRightInverseExist mat)) then raise NoRightInverse
+
+        // Calculate right inverse C, C = A^T * (A * A^T)^(-1)
+        let transposeMat = Matrix.Transpose mat
+        Matrix.Multiply transposeMat (Inverse (Matrix.Multiply mat transposeMat))
+    
+    /// <summary>Computes left inverse of given matrix if exists.</summary>
+    /// <param name="mat">Matrix to compute left inverse of.</param>
+    /// <returns>Left inverse of given matrix.</returns>
+    /// exception cref="FSharp_Linear_Algebra.Matrix.NoLeftInverse">Thrown when given matrix does not have left inverse.</exception>
+    let inline LeftInverse (mat : 'T matrix) : 'T matrix = 
+        // Check if left inverse exists.
+        if (not (IsLeftInverseExist mat)) then raise NoLeftInverse
+
+        // Calculate left inverse B, B = (A^T * A)^(-1) * A^T
+        let transposeMat = Matrix.Transpose mat
+        Matrix.Multiply (Inverse (Matrix.Multiply transposeMat mat)) transposeMat
 
     /// <summary>Computes column space of given matrix.</summary>
     /// <param name="mat">Matrix to compute column space of.</param>
@@ -99,6 +174,41 @@ module Matrix =
             columnSpace.Value <- Array.append columnSpace.Value [| vector<'T>(mat.element.[*, pivot]) |]
 
         columnSpace.Value
+    
+    /// <summary>Computes row space of given matrix.</summary>
+    /// <param name="mat">Matrix to compute row space of.</param>
+    /// <returns>Returns row space of given matrix as array of row vectors.</returns>
+    let inline RowSpace (mat : 'T matrix) : 'T vector [] =
+        // RREF-decompose to find pivot rows.
+        let rrefResult = Decomposition.RREFdecomposition mat
+        let rrefResultRREF = rrefResult.RREF
+
+        // Find non-zero rows, which contains pivots.
+        let nonZeroRows = ref ([| |] : 'T vector [])
+        let mutable breakSearch = false
+        let mutable rowIter = 0
+        // Iterate through rows and find non-zero rows.
+        while (rowIter < rrefResultRREF.rowCnt && not breakSearch) do
+            // Check if current row is non-zero
+            let mutable isZero = true
+            let mutable columnIter = 0
+            // Iterate through elements and determine whether current row is non-zero or not.
+            while (columnIter < rrefResultRREF.columnCnt && isZero) do
+                if (rrefResultRREF.element.[rowIter, columnIter] <> LanguagePrimitives.GenericZero) then
+                    isZero <- false
+                else
+                    columnIter <- columnIter + 1
+            if not isZero then 
+                // If current row is non-zero, 
+                // add row of original matrix which is at the corresponding order to current row.
+                nonZeroRows.Value <- Array.append nonZeroRows.Value [| (vector<'T>(mat.element.[rowIter, *])) |]
+                rowIter <- rowIter + 1
+            else 
+                breakSearch <- true
+        
+        // Return non-zero rows, which are basis for row space.
+        nonZeroRows.Value
+                    
 
     /// <summary>Computes null space of given matrix.</summary>
     /// <param name="mat">Matrix to compute null space of.</param>
@@ -145,30 +255,12 @@ module Matrix =
 
         resArray.Value
     
-    /// <summary>Computes rank of given matrix with RREF-decomposition.</summary>
-    /// <param name="mat">Matrix to compute rank.</param>
-    /// <returns>Returns rank of given matrix.</returns>
-    let inline Rank (mat : 'T matrix) : int = 
-        // Decompose given matrix.
-        let rrefResult = Decomposition.RREFdecomposition mat
-        let rrefResultRREF = rrefResult.RREF
-
-        // Calculate number of non-zero rows.
-        let mutable rowCheckCount = 0
-        let mutable checkEnd = false
-        while (rowCheckCount < rrefResultRREF.rowCnt && not checkEnd) do
-            let currentRow = rrefResultRREF.element.[rowCheckCount, *]
-            let mutable isZeroRow = true
-            let mutable elemCnt = 0
-            while (elemCnt < rrefResultRREF.columnCnt && isZeroRow) do
-                if currentRow.[elemCnt] <> LanguagePrimitives.GenericZero then isZeroRow <- false
-                elemCnt <- elemCnt + 1
-            if not isZeroRow then 
-                rowCheckCount <- rowCheckCount + 1
-            else
-                checkEnd <- true
-        
-        rowCheckCount
+    /// <summary>Computes left null space of given matrix.</summary>
+    /// <param name="mat">Matrix to compute left null space.</param>
+    /// <returns>Returns left null space of given matrix as array of vectors.</returns>
+    let inline LeftNullSpace (mat : 'T matrix) : 'T vector [] =
+        let transposeMat = Matrix.Transpose mat
+        NullSpace transposeMat
         
     /// <summary>Solves system of linear equations, Ax=b. Solution dose not include null-space solutions.</summary>
     /// <param name="mat">Matrix of coefficients, A.</param>
